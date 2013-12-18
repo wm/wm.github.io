@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>WaveTouch: Software </title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/08/wavetouch-software">WaveTouch: Software </a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on August  9, 2007
+</div>
+  <p>Our systems architecture looks like this<br />
+<img src="/TUI/software.jpg" alt="System" width="500" /></p>
+<p><!--more--></p>
+<p>Continue Reading<!--noteaser--><br />
+Our systems architecture looks like this<br />
+<img src="/TUI/software.jpg" alt="System" /></p>
+<p>A Java application runs the image capture, Top Code Coordinate decoding, wave recognition and sound play. This application also outputs the coordinates to a Ruby script that launches a Tk <span class="caps">GUI</span>. The Ruby script draws the wave on the <span class="caps">GUI</span>. This <span class="caps">GUI</span> is then projected onto the surface.</p>
+<p>The java structure is as follows<br />
+<a href="/TUI/wavePackageImage.jpeg"><img src="/TUI/wavePackageImage.jpeg" alt="Java System" width="700" /></a></p>
+<p>The JavaDoc of this application is available to view <a href="/TUI/wavecode/doc/index.html">here</a> and can be downloaded <a href="/TUI/JavaDoc.tgz">here</a>. The <span class="caps">JAR</span> file contains both the .class files and the code files (.java) and can be downloaded <a href="/TUI/wavedecode.jar">here</a>.</p>
+<p>The Ruby/Tk code is <a href="http://tui.nfshost.com/src/">here</a>.</p>
+<p>The sound files we used can be found <a href="/TUI/sounds.tgz">here</a>.<br />
+Installation Instructions for a Mac <span class="caps">OSX</span> system.<br />
+    <li>1. Download the complete package <a href="/TUI/WaveTouchPKG.tgz">here</a>.</li></p>
+    <li>2. Open a terminal</li>
+    <li>3. Uncompress the downloaded WaveTouchPKG.tgz file<br />
+<ul><br />
+<code>tar -zxpvf WaveTouchPKG.tgz</code></ul>
+</li>
+    <li>4. Change directory to wavetouch<br />
+<ul><br />
+<code>cd WaveTouch</code></ul>
+</li>
+    <li>5. Run the script wavetouch.sh<br />
+<ul><br />
+<code>./wavetouch.sh 500</code></ul>
+</li>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/08/wavetouch-software';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

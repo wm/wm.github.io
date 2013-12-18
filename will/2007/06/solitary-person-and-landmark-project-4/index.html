@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Solitary Person and Landmark - Project 4</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/06/solitary-person-and-landmark-project-4">Solitary Person and Landmark - Project 4</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on June 22, 2007
+</div>
+  <p><strong>Goal:</strong> To create an image of a person in front of a busy landmark. But to only have the person and the land mark in the photo.</p>
+<p><strong>Motivation:</strong> To take a photo like this but without people in the background. All you want is the subject (Girl in denim skirt) and the background (statue, etc.), no other people. This could be used by photographers at busy tourist attractions. They could take photos of you at busy places but still ensure that you have a good picture with out unwanted people.<!--more--><br />
+<img src="/tuftsphoto/wp-content/uploads/fxcd0019.jpg" width="500" alt="NYC" /></p>
+<p><strong>Approach:</strong> To take multiple images of landmark and from that create an image with no people by taking the median of the pixels over the range of images. Then take a photo with the subject in front of the landmark. In this photo just the subject should be in focus. Use this image to create a detail mask and take the pixels from the first hybrid image for the background and the pixels from the last image that have sharp edges for the foreground.</p>
+<p><strong>Deliverables:</strong> I hope to have this as a self contained program. The idea would be to pass the program a location containing the<br />
+images needed to create the background and a file with the subject.</p>
+<p><strong>References:</strong> This is similar to some work done in <a href="http://grail.cs.washington.edu/projects/photomontage/">&#8220;Interactive Digital Photomontage&#8221;</a> paper. However what is novel about this is that the result will have one variance and will hopefully not require any manual steps.</p>
+<p><strong>Result</strong><br />
+Hopefully an image like this where there are no unwanted people.<br />
+<img src="/tuftsphoto/wp-content/uploads/cimg0212.jpg" alt="result" /></p>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/06/solitary-person-and-landmark-project-4';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

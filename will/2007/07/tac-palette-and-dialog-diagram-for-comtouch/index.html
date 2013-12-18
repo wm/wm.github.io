@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>TAC Palette and Dialog Diagram for ComTouch</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/07/tac-palette-and-dialog-diagram-for-comtouch">TAC Palette and Dialog Diagram for ComTouch</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on July 15, 2007
+</div>
+  <p><span class="caps">TUI</span> &#8211; Assignment 1</p>
+<p>For this assignment I read the <a href="http://www.cs.tufts.edu/~jacob/papers/dis02.pdf">ComTouch: A Vibrotactile Communication Device</a> paper.</p>
+<p>After reading the paper I had to create a <span class="caps">TAC</span> Palette to describe the token and constraints of the device. I then described how the <span class="caps">TUI</span> is interacted with via a Dialog Diagram.</p>
+<p><!--more--></p>
+<p>Part 1<br />
+<img src="/TUI/ComTouchPalette.jpg" alt="TAC Palette" /></p>
+<p>Part 2<br />
+This <span class="caps">TUI</span> does not have a lot of physical syntax. The user can do only two things. Press (Send) and feel (Receive). The user is constrained to both these uses by the physical shape of the device. <br />
+Regarding the pressure the user is guided on how to use it by the feed back vibrations. When the user places a hand on the system and presses the sensor a feedback correlates with the amount of pressure. This indicates to the user how the system works. There may be one problem. If the user holds the device and thus applies pressure they will fell the feedback also. They may think that the device was vibrating before holding the device. <br />
+Regarding the vibration the users only interaction is to feel it. They obviously know that they can feel vibration if it vibrates and not by letting go of the device. However they may be able to hear the device vibrate on a table or some other solid surface. <br />
+The physical relation between the tokens and constraints does physically guide the user. One part of the <span class="caps">TAC</span> is part of the user (the hand) the other is shaped to hold the hand (the groove on the phone).</p>
+<p>Part 3<br />
+<img src="/TUI/ComTouchDialogDiagram.jpg" alt="Dialog Diagram" width="700" /></p>
+<p>Part 4<br />
+All information in this system is in real-time. No data is stored within the system. Also the <span class="caps">TUI</span> is both input and output and requires two or more users. The data itself is stored by the person sending (info to send) or receiving (info received). <br />
+The systems physical state does have some information to enable the user to determine what tasks are available or not. Looking at the device does not show that you can send info by pressure and receive vibration. However just holding the device the user may be able to feel the feedback and a soft part that it knows to press.<br />
+Both tasks can be done in parallel. The user can feel a vibration and press the sensor at the same time. These are the only two tasks.</p>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/07/tac-palette-and-dialog-diagram-for-comtouch';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

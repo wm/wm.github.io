@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+ <title>Will Mernagh</title>
+ <link href="http://will.willandorla.com/atom.xml" rel="self"/>
+ <link href="http://will.willandorla.com/"/>
+ <updated>2011-06-11T15:21:06-04:00</updated>
+ <id>http://will.willandorla.com/</id>
+ <author>
+   <name>Will Mernagh</name>
+ </author>
+ 
+ <entry>
+   <title>My Backup Strategy</title>
+   <link href="http://will.willandorla.com/2011/03/backup-strategy"/>
+   <updated>2011-03-28T00:00:00-04:00</updated>
+   <id>http://will.willandorla.com/2011/03/backup-strategy</id>
+   <content type="html">&lt;p&gt;Unfortunately there is no backup silver bullet, so to ensure that I have the computers in my home backuped and secured I use a mix of services. In the following sections I will describe how I use Time Machine, &lt;a href='http://www.haystacksoftware.com/arq/'&gt;Arq&lt;/a&gt; and GitHub to keep my data backed up and secure.&lt;/p&gt;
+
+&lt;h3 id='time_machine_and_drobo'&gt;Time Machine and &lt;a href='http://www.drobo.com/products_time_machine.aspx'&gt;Drobo&lt;/a&gt;&lt;/h3&gt;
+
+&lt;p&gt;I use Time Machine to fully backup 3 MacBooks and a MacMini to a &lt;a href='http://www.drobo.com/products_time_machine.aspx'&gt;Drobo&lt;/a&gt; that is attached to the MacMini.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;#8220;The longer Time Machine is used, the more&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;data storage it requires. Unlike other protected storage arrays, &lt;a href='http://www.drobo.com/products_time_machine.aspx'&gt;Drobo&lt;/a&gt; uses patent-pending BeyondRAID software that is designed for non-technical users who demand both reliability and instant expandability without the complexity of traditional RAID.&amp;#8221; - &lt;a href='http://www.drobo.com/products_time_machine.aspx'&gt;&lt;a href='http://www.drobo.com/products_time_machine.aspx'&gt;Drobo&lt;/a&gt; Site&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;The &lt;a href='http://www.drobo.com/products_time_machine.aspx'&gt;Drobo&lt;/a&gt; provides the ability to &amp;#8220;Hot Swap&amp;#8221; drives if they fail or if space is running out.&lt;/p&gt;
+
+&lt;p&gt;If a hard drive fails in any of my computers I can restore from Time Machine in a couple of hours.&lt;/p&gt;
+
+&lt;p&gt;The Time Machine solution makes it easy to do full backups and is trivial to setup.&lt;/p&gt;
+
+&lt;h3 id='arq'&gt;&lt;a href='http://www.haystacksoftware.com/arq/'&gt;Arq&lt;/a&gt;&lt;/h3&gt;
+
+&lt;p&gt;Thanks to the reliability of &lt;a href='http://www.drobo.com/products_time_machine.aspx'&gt;Drobo&lt;/a&gt;, and the daily incremental backups to it via TimeMachine, the only way to have data loss is if the computers and &lt;a href='http://www.drobo.com/products_time_machine.aspx'&gt;Drobo&lt;/a&gt; are stolen or somehow destroyed (e.g. by fire). So for a subset of data that I deem most critical, and that would not be recoverable if I lost both my computers and &lt;a href='http://www.drobo.com/products_time_machine.aspx'&gt;Drobo&lt;/a&gt;, I use &lt;a href='http://www.haystacksoftware.com/arq/'&gt;Arq&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;I use &lt;a href='http://www.haystacksoftware.com/arq/'&gt;Arq&lt;/a&gt; to back up my most critical files to &lt;a href='http://aws.amazon.com/s3/'&gt;Amazon S3&lt;/a&gt;. &lt;a href='http://aws.amazon.com/s3/'&gt;Amazon S3&lt;/a&gt; is a &amp;#8220;highly scalable, reliable, secure, fast, and inexpensive infrastructure&amp;#8221; that Amazon uses for its own applications.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href='http://www.haystacksoftware.com/arq/'&gt;Arq&lt;/a&gt; backups are complete and accurate, including all &amp;#8220;metadata&amp;#8221;. I do an incremental backup every night on my main computer&amp;#8217;s home direcotry (with a few exceptions - see the final section). My current backup size is 66GB and I transfer about 400MB-700MB per night. This works out at a monthly cost of less than $4.&lt;/p&gt;
+
+&lt;p&gt;The speed of transfer to &lt;a href='http://aws.amazon.com/s3/'&gt;S3&lt;/a&gt; is amazing. It is almost as fast as the backup to Time Machine (and the size is usually the same). If I could afford to fully backup my computers to &lt;a href='http://aws.amazon.com/s3/'&gt;S3&lt;/a&gt; I would and then maybe I could do away with Time Machine.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href='http://www.haystacksoftware.com/arq/'&gt;Arq&lt;/a&gt; also encrypts the data that is stored on &lt;a href='http://aws.amazon.com/s3/'&gt;S3&lt;/a&gt;. I use a generated password to access my &lt;a href='http://aws.amazon.com/s3/'&gt;S3&lt;/a&gt; account. The data is encrypted with a generated key. The &lt;a href='http://www.haystacksoftware.com/arq/'&gt;Arq&lt;/a&gt; program remembers this information so I do not need to remember the keys. However since these are complicated passowrd/keys that I do not memorize I need a place to store them securly. And of course I will need access to this if I do not have my computers or &lt;a href='http://www.drobo.com/products_time_machine.aspx'&gt;Drobo&lt;/a&gt;. For this I use &lt;a href='http://agilewebsolutions.com/products/1Password'&gt;1Password&lt;/a&gt; and &lt;a href='http://dropbox.com'&gt;DropBox&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id='1password_and_dropbox'&gt;&lt;a href='http://agilewebsolutions.com/products/1Password'&gt;1Password&lt;/a&gt; and DropBox&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href='http://agilewebsolutions.com/products/1Password'&gt;1Password&lt;/a&gt; is a password management tool that stores all my passwords. I just have to remember one password to unlock the app and I can retrieve any of my passwords. It also has built in browser support so you can easily sign into websites or enter credit card information online.&lt;/p&gt;
+
+&lt;p&gt;One of its best features is that you can store the encrypted password file in a shared folder and access it from multiple computers. This way all your computers have all your latest passwords.&lt;/p&gt;
+
+&lt;p&gt;Since I often have my laptop offline or not on my home network I alwas want a local copy of this password file. To do this I use &lt;a href='http://dropbox.com'&gt;DropBox&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;DropBox allows you to replicate a folder on your computer to their cloud. With this I replicate the folder across all my computers and it manages keeping them in sync. &lt;a href='http://agilewebsolutions.com/products/1Password'&gt;1Password&lt;/a&gt; also ensures that if you were accessing the password file from multiple computers at once that the data is not corrupted.&lt;/p&gt;
+
+&lt;p&gt;One nice addition to using &lt;a href='http://agilewebsolutions.com/products/1Password'&gt;1Password&lt;/a&gt; and DropBox is that there that &lt;a href='http://agilewebsolutions.com/products/1Password'&gt;1Password&lt;/a&gt; has an iPhone app that has support for connecting to DropBox also. So now I also have all my passwords on my iPhone too.&lt;/p&gt;
+
+&lt;h3 id='excluded_from_backup_to_amazon_s3_simple_storage_service'&gt;Excluded from Backup to &lt;a href='http://aws.amazon.com/s3/'&gt;Amazon S3 (&amp;#8220;Simple Storage Service&amp;#8221;)&lt;/a&gt;&lt;/h3&gt;
+
+&lt;p&gt;I keep all my &lt;a href='http://github.com'&gt;Github&lt;/a&gt; repositories in my ~/Development directory and always try to keep my work pushed to &lt;a href='http://github.com'&gt;Github&lt;/a&gt;. If I have work in progress changes I usually push them to a branch off of master. Because of this I do not backup my ~/Development directory to &lt;span&gt;Amazon S3&lt;/span&gt;](http://aws.amazon.com/s3/) since it is redundant. The size of some of my repositories is large too so this is a good thing.&lt;/p&gt;
+
+&lt;p&gt;Similarly I have my music replicated over a few computers, ipods, etc. So I do not back this up either to &lt;a href='http://aws.amazon.com/s3/'&gt;Amazon S3&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;I also have a &lt;a href='http://flickr.com'&gt;Flickr&lt;/a&gt; Pro account that I store all my photos on so I do not backup my Pictures folder to &lt;a href='http://aws.amazon.com/s3/'&gt;Amazon S3&lt;/a&gt; either.&lt;/p&gt;
+
+&lt;p&gt;There are a number of other folders I exclude that are application related since I can always reinstall the applications (e.g. Library/Caches, Library/Logs, Dropbox, Downloads).&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Avoid jQuery Hanging in Akephalos</title>
+   <link href="http://will.willandorla.com/2011/01/jQuery-hang-in-akephalos"/>
+   <updated>2011-01-21T00:00:00-05:00</updated>
+   <id>http://will.willandorla.com/2011/01/jQuery-hang-in-akephalos</id>
+   <content type="html">&lt;p&gt;I have been using Akephalos with Cucumber/Capybara for a few weeks now. It tends to hang on jQuery (v1.4.3) calls&lt;/p&gt;
+
+&lt;p&gt;e.g. step that it would hang on&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;  &lt;span class='no'&gt;When&lt;/span&gt;&lt;span class='sr'&gt; /^I double click on ([^&amp;quot;].*)$/&lt;/span&gt; &lt;span class='k'&gt;do&lt;/span&gt; &lt;span class='o'&gt;|&lt;/span&gt;&lt;span class='n'&gt;named_element&lt;/span&gt;&lt;span class='o'&gt;|&lt;/span&gt;
+      &lt;span class='n'&gt;selector&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='n'&gt;selector_for&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='n'&gt;named_element&lt;/span&gt;&lt;span class='p'&gt;)&lt;/span&gt;
+      &lt;span class='n'&gt;page&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;evaluate_script&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='s2'&gt;&amp;quot;$(&amp;#39;&lt;/span&gt;&lt;span class='si'&gt;#{&lt;/span&gt;&lt;span class='n'&gt;selector&lt;/span&gt;&lt;span class='si'&gt;}&lt;/span&gt;&lt;span class='s2'&gt;&amp;#39;).dblclick()&amp;quot;&lt;/span&gt;&lt;span class='p'&gt;)&lt;/span&gt;
+  &lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;I found that if I do not call jQuery directly that it works fine so I did the following.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;  &lt;span class='no'&gt;When&lt;/span&gt;&lt;span class='sr'&gt; /^I double click on ([^&amp;quot;].*)$/&lt;/span&gt; &lt;span class='k'&gt;do&lt;/span&gt; &lt;span class='o'&gt;|&lt;/span&gt;&lt;span class='n'&gt;named_element&lt;/span&gt;&lt;span class='o'&gt;|&lt;/span&gt;
+      &lt;span class='n'&gt;selector&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='n'&gt;selector_for&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='n'&gt;named_element&lt;/span&gt;&lt;span class='p'&gt;)&lt;/span&gt;
+      &lt;span class='n'&gt;page&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;evaluate_script&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='s2'&gt;&amp;quot;double_click(&amp;#39;&lt;/span&gt;&lt;span class='si'&gt;#{&lt;/span&gt;&lt;span class='n'&gt;selector&lt;/span&gt;&lt;span class='si'&gt;}&lt;/span&gt;&lt;span class='s2'&gt;&amp;#39;)&amp;quot;&lt;/span&gt;&lt;span class='p'&gt;)&lt;/span&gt;
+  &lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='javascript'&gt;  &lt;span class='err'&gt;#&lt;/span&gt; &lt;span class='kr'&gt;public&lt;/span&gt;&lt;span class='o'&gt;/&lt;/span&gt;&lt;span class='nx'&gt;javascripts&lt;/span&gt;&lt;span class='o'&gt;/&lt;/span&gt;&lt;span class='nx'&gt;test_helpers&lt;/span&gt;&lt;span class='p'&gt;.&lt;/span&gt;&lt;span class='nx'&gt;js&lt;/span&gt;
+  &lt;span class='kd'&gt;var&lt;/span&gt; &lt;span class='nx'&gt;double_click&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='kd'&gt;function&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='nx'&gt;query&lt;/span&gt;&lt;span class='p'&gt;)&lt;/span&gt; &lt;span class='p'&gt;{&lt;/span&gt;
+      &lt;span class='nx'&gt;$&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='nx'&gt;query&lt;/span&gt;&lt;span class='p'&gt;).&lt;/span&gt;&lt;span class='nx'&gt;dblclick&lt;/span&gt;&lt;span class='p'&gt;();&lt;/span&gt;
+  &lt;span class='p'&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;I hope this can help others. I do not know why this works and a direct call does not.&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>How to apply changes to all VIM open buffers</title>
+   <link href="http://will.willandorla.com/2011/01/vim-open-into-and-update-all-buffers"/>
+   <updated>2011-01-13T00:00:00-05:00</updated>
+   <id>http://will.willandorla.com/2011/01/vim-open-into-and-update-all-buffers</id>
+   <content type="html">&lt;p&gt;A simple way to make modifications to a lot of file is to open all of them in vi and apply the search and replace to every file that is buffered. The easiest way to do this is as follows&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;  :bufdo %s/pattern/substitution/ge | update
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;bufdo – apply to all buffers&lt;/p&gt;
+
+&lt;p&gt;e – ignore no pattern match errors in a buffer&lt;/p&gt;
+
+&lt;p&gt;update – write only if the files changed&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Convert subfolder into Git submodule</title>
+   <link href="http://will.willandorla.com/2011/01/convert-folder-into-git-submodule"/>
+   <updated>2011-01-13T00:00:00-05:00</updated>
+   <id>http://will.willandorla.com/2011/01/convert-folder-into-git-submodule</id>
+   <content type="html">&lt;p&gt;Recently I had the need to refactor a large repository we use at work. The layout of the repository was as follows&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;~ &lt;span class='nv'&gt;$ &lt;/span&gt;&lt;span class='nb'&gt;cd&lt;/span&gt; ~/Development/LUF
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; Development &lt;span class='nv'&gt;$ &lt;/span&gt;ls
+  src/
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; Development &lt;span class='nv'&gt;$ &lt;/span&gt;&lt;span class='nb'&gt;cd &lt;/span&gt;src; ls
+  AAR/ MSEL/ SigEvServer/ WebServices/
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; src &lt;span class='err'&gt;$&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;All the apps in the src folder were Rails app (except AAR) and I wanted to move each Rails app to its own repository and then include those repositories as submodules with in the src folder.&lt;/p&gt;
+
+&lt;h2 id='step_1_clone_new_repositories'&gt;Step 1. Clone new repositories.&lt;/h2&gt;
+
+&lt;p&gt;You will need a new repository for each one that you are moving. Since we want to keep the history of each subfolder we need to clone the repo as follows.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;  
+  ~ &lt;span class='nv'&gt;$ &lt;/span&gt;&lt;span class='nb'&gt;cd &lt;/span&gt;Development
+  Development &lt;span class='nv'&gt;$ &lt;/span&gt;git clone --no-hardlinks LUF MSEL
+  Development &lt;span class='nv'&gt;$ &lt;/span&gt;git clone --no-hardlinks LUF SigEvServer
+  Development &lt;span class='nv'&gt;$ &lt;/span&gt;git clone --no-hardlinks LUF WebServices
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h2 id='step_2_filter_out_the_files_you_want_to_keep_and_remove_the_others'&gt;Step 2. Filter out the files you want to keep and remove the others.&lt;/h2&gt;
+
+&lt;p&gt;Now we will move all the files we want to keep up to the top level folder. Reset the head and then prune out all the other files. We will also remove the origin too since they will no longer be compatible.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;  ~ &lt;span class='nv'&gt;$ &lt;/span&gt;&lt;span class='nb'&gt;cd &lt;/span&gt;Development/MSEL
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; MSEL &lt;span class='nv'&gt;$ &lt;/span&gt;git filter-branch --subdirectory-filter src/MSEL HEAD -- --all
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; MSEL &lt;span class='nv'&gt;$ &lt;/span&gt;git reset --hard
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; MSEL &lt;span class='nv'&gt;$ &lt;/span&gt;git gc --aggressive
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; MSEL &lt;span class='nv'&gt;$ &lt;/span&gt;git prune
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; MSEL &lt;span class='nv'&gt;$ &lt;/span&gt;git remote rm origin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Repeat the process for SigEvServer and WebServices&lt;/p&gt;
+
+&lt;h2 id='setp_3_push_the_new_repositories_to_the_upstream_server'&gt;Setp 3. Push the new repositories to the upstream server.&lt;/h2&gt;
+
+&lt;p&gt;Now that you have local copies of all the repositories that you wanted you need to push them to the upstream server so everyone can use them.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;  ~ &lt;span class='nv'&gt;$ &lt;/span&gt;&lt;span class='nb'&gt;cd &lt;/span&gt;Development/MSEL
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; MSEL &lt;span class='nv'&gt;$ &lt;/span&gt;git remote add git@github.com:wmernagh/MSEL.git
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Repeat the process for SigEvServer and WebServices&lt;/p&gt;
+
+&lt;h2 id='step_4_add_the_new_repository_as_submodules_to_the_original_repository'&gt;Step 4. Add the new repository as submodules to the original repository&lt;/h2&gt;
+
+&lt;p&gt;The final step is to remove the folders from the initial repository and add in the missing folders as submodules.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;  ~ &lt;span class='nv'&gt;$ &lt;/span&gt;&lt;span class='nb'&gt;cd &lt;/span&gt;Development/LUF
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; LUF &lt;span class='nv'&gt;$ &lt;/span&gt;git rm src/MSEL src/SigEvServer src/WebServices
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; LUF &lt;span class='nv'&gt;$ &lt;/span&gt;git commit -m &lt;span class='s2'&gt;&amp;quot;Removing the folders that are now repositories&amp;quot;&lt;/span&gt;
+
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; LUF &lt;span class='nv'&gt;$ &lt;/span&gt;git submodule add git@github.com:wmernagh/MSEL.git src/MSEL
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; LUF &lt;span class='nv'&gt;$ &lt;/span&gt;git submodule add git@github.com:wmernagh/SigEvServer.git src/SigEvServer
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; LUF &lt;span class='nv'&gt;$ &lt;/span&gt;git submodule add git@github.com:wmernagh/WebServices.git src/WebServices
+
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; LUF &lt;span class='nv'&gt;$ &lt;/span&gt;git submodule init
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; LUF &lt;span class='nv'&gt;$ &lt;/span&gt;git submoduel update
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; LUF &lt;span class='nv'&gt;$ &lt;/span&gt;git add .gitmodules src
+  &lt;span class='o'&gt;(&lt;/span&gt;master&lt;span class='o'&gt;)&lt;/span&gt; LUF &lt;span class='nv'&gt;$ &lt;/span&gt;git commit -m &lt;span class='s2'&gt;&amp;quot;Added in submodules for removed folders&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;That&amp;#8217;s it.&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Using Rebase instead of Merge for pulls</title>
+   <link href="http://will.willandorla.com/2010/10/Rebase-instead-Merge-for-pulls"/>
+   <updated>2010-10-19T00:00:00-04:00</updated>
+   <id>http://will.willandorla.com/2010/10/Rebase-instead-Merge-for-pulls</id>
+   <content type="html">&lt;p&gt;Instead of doing a regular pull&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;     git &lt;span class='nv'&gt;pull&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt;&amp;gt; git fetch &lt;span class='o'&gt;&amp;amp;&amp;amp;&lt;/span&gt; git merge remotes/origin/BRANCH BRANCH
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;To avoid the all the merge commit messages you can run the following command instead&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;     git pull --rebase &lt;span class='o'&gt;=&lt;/span&gt;&amp;gt; git fetch &lt;span class='o'&gt;&amp;amp;&amp;amp;&lt;/span&gt; git rebase remotes/origin/BRANCH BRANCH
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;I actually have the following in my ~/.gitconfig file&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;    &lt;span class='o'&gt;[&lt;/span&gt;&lt;span class='nb'&gt;alias&lt;/span&gt;&lt;span class='o'&gt;]&lt;/span&gt;
+        &lt;span class='nv'&gt;up&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; !sh -c &lt;span class='s1'&gt;&amp;#39;git pull --rebase --prune &amp;amp;&amp;amp; git log --pretty=format:\&amp;quot;%Cred%ae %Creset- %C(yellow)%s %Creset(%ar)\&amp;quot; HEAD@{1}..&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;So when I run &amp;#8216;git up&amp;#8217; it does a pull and prints out a concisely what was pulled. I got it from &lt;a href='http://github.com/kneath'&gt;Kyle Neath&lt;/a&gt;&amp;#8217;s &lt;a href='http://gist.github.com/249223' title='Badass git pull alternative'&gt;gist&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id='difference_between_rebase_and_a_merge'&gt;Difference between rebase and a merge&lt;/h2&gt;
+
+&lt;h3 id='simple_answer'&gt;Simple answer&lt;/h3&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;git pull
+  does a merge of your master and the remotes/origin/master and creates
+  a commit to capture the merge.
+git pull --rebase 
+  stashes your unpushed commits from master, fast-forwards the upstream 
+  changes from remotes/origin/master and &lt;span class='k'&gt;then &lt;/span&gt;replays your stashed 
+  commits.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id='verbose_answer'&gt;Verbose answer&lt;/h3&gt;
+
+&lt;p&gt;GIT PULL (merge)&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;Assume the following &lt;span class='nb'&gt;history &lt;/span&gt;exists and the current branch is &lt;span class='s2'&gt;&amp;quot;master&amp;quot;&lt;/span&gt;:
+
+           A---B---C master on origin
+          /
+     D---E---F---G master
+ Then &lt;span class='s2'&gt;&amp;quot;git pull&amp;quot;&lt;/span&gt; will fetch and replay the changes from the remote
+ master branch since it diverged from the &lt;span class='nb'&gt;local &lt;/span&gt;master &lt;span class='o'&gt;(&lt;/span&gt;i.e., E&lt;span class='o'&gt;)&lt;/span&gt; &lt;span class='k'&gt;until&lt;/span&gt;
+&lt;span class='k'&gt; &lt;/span&gt;its current commit &lt;span class='o'&gt;(&lt;/span&gt;C&lt;span class='o'&gt;)&lt;/span&gt; on top of master and record the result in a new
+ commit along with the names of the two parent commits and a log message
+ from the user describing the changes.
+
+           A---B---C remotes/origin/master
+          /         &lt;span class='se'&gt;\&lt;/span&gt;
+     D---E---F---G---H master
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;GIT PULL (rebase)&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;Assume the following &lt;span class='nb'&gt;history &lt;/span&gt;exists and the current branch is &lt;span class='s2'&gt;&amp;quot;topic&amp;quot;&lt;/span&gt;:
+
+             A---B---C master
+            /
+       D---E---F---G master on origin
+
+   Then &lt;span class='s2'&gt;&amp;quot;git pull --rebase&amp;quot;&lt;/span&gt; will fetch, stash &lt;span class='nb'&gt;local &lt;/span&gt;commits &lt;span class='o'&gt;(&lt;/span&gt;A, B, C&lt;span class='o'&gt;)&lt;/span&gt;, 
+   fast-forward, and replay
+   your stashed commits on top of master &lt;span class='o'&gt;(&lt;/span&gt;as A&lt;span class='s1'&gt;&amp;#39;, B&amp;#39;&lt;/span&gt;, C&lt;span class='s1'&gt;&amp;#39;) including &lt;/span&gt;
+&lt;span class='s1'&gt;   recreating the commit messages.&lt;/span&gt;
+
+&lt;span class='s1'&gt;                     A&amp;#39;&lt;/span&gt;--B&lt;span class='s1'&gt;&amp;#39;--C&amp;#39;&lt;/span&gt; master
+                    /
+       D---E---F---G master on origin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>The Power Of Boxcar For iPhone</title>
+   <link href="http://will.willandorla.com/2010/09/The-power-of-Boxcar-for-iPhone"/>
+   <updated>2010-09-15T00:00:00-04:00</updated>
+   <id>http://will.willandorla.com/2010/09/The-power-of-Boxcar-for-iPhone</id>
+   <content type="html">&lt;p&gt;Boxcar is an app and service that pushes data to your iPhone. You can push updates form Twitter, Facebook, GMail&amp;#8230; Download the app &lt;a href=&quot;http://bit.ly/Boxcar&quot;&gt;here&lt;/a&gt; (it is free but ad supported) and connect to the services you want pushed to you. It even opens the up the Twitter and Facebook app when you view a notification.&lt;/p&gt;
+&lt;p&gt;So why would you want to use Boxcar for apps that have native push (Facebook, Mail and soon Twitter)? I am going to list a few reasons and give real examples based on my own setup.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://cl.ly/2PNP&quot;&gt;&lt;img src=&quot;http://cl.ly/2PNP/IMG_0921.PNG&quot; style=&quot;width:45%;&quot; title=&quot;Boxcar&quot; alt=&quot;Boxcar&quot; /&gt;&lt;/a&gt; &lt;a href=&quot;http://cl.ly/2PRw&quot;&gt;&lt;img src=&quot;http://cl.ly/2PRw/IMG_0922.PNG&quot; style=&quot;width:45%;&quot; title=&quot;Boxcar&quot; alt=&quot;Boxcar&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h4&gt;1. Quiet Time&lt;/h4&gt;
+&lt;p&gt;Although the native apps may have push with Boxcar you can setup quiet time. Basically this is time when notifications will not be pushed to you. I have mine set as follows&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://cl.ly/2OzR&quot;&gt;&lt;img src=&quot;http://cl.ly/2OzR/IMG_0919.PNG&quot; style=&quot;width:45%;&quot; title=&quot;Boxcar&quot; alt=&quot;Boxcar&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Currently this is all or nothing though. At present you cannot have different quiet times for different services.&lt;/p&gt;
+&lt;h4&gt;2. More Sound options&lt;/h4&gt;
+&lt;p&gt;There are many different sounds that you can use for incoming notifications. I have different ones for email (which is more important) than for Twitter and Facebook.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://cl.ly/2P1D&quot;&gt;&lt;img src=&quot;http://cl.ly/2P1D/IMG_0926.PNG&quot; style=&quot;width:45%;&quot; title=&quot;Boxcar&quot; alt=&quot;Boxcar&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;And if you have different setups for the same account as is explained in the next section you can have different sounds for DMs in Twitter than you do for @mentions.&lt;/p&gt;
+&lt;h4&gt;3. Multiple setups for one account&lt;/h4&gt;
+&lt;p&gt;You can also create multiple connections to the one account. For example I have multiple connections to Twitter. I have one for the important stuff (DMs and @mentions) and another for a list I created of people I want update from (I could use my timeline too but that is too busy).&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://cl.ly/2Ozw&quot;&gt;&lt;img src=&quot;http://cl.ly/2Ozw/IMG_0924.PNG&quot; style=&quot;width:45%;&quot; title=&quot;Boxcar&quot; alt=&quot;Boxcar&quot; /&gt;&lt;/a&gt; &lt;a href=&quot;http://cl.ly/2Owx&quot;&gt;&lt;img src=&quot;http://cl.ly/2Owx/IMG_0923.PNG&quot; style=&quot;width:45%;&quot; title=&quot;Boxcar&quot; alt=&quot;Boxcar&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;With this setup I get all the important ones and a subset of my timeline pushed to me. I could also use a different sound for each so I know what was just pushed.&lt;/p&gt;
+&lt;p&gt;Similarly you may want to setup a filter in GMail for Important mail and have that sent to push to you separately than your regular inbox. That way you can turn off all services in an meetings for example but be use to get important messages pushed to you.&lt;/p&gt;
+&lt;h4&gt;4. Send whatever you want via Boxcar&amp;#8217;s &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;&lt;/h4&gt;
+&lt;p&gt;Boxcar also has an &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; for you to play with so that you get what ever notifications you desire.&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Mvc Dev In Ruby</title>
+   <link href="http://will.willandorla.com/2010/04/mvc-dev-in-ruby"/>
+   <updated>2010-04-11T00:00:00-04:00</updated>
+   <id>http://will.willandorla.com/2010/04/mvc-dev-in-ruby</id>
+   <content type="html">&lt;p&gt;Ruby is dynamic object-orientated language that has a simple and elegant syntax enabling users to write beautiful code. Cocoa is Apple’s object-orientated Model View Controller (MVC) framework for building applications for MAC OS X. Cocoa is implemented in Objective-C, an object-orientated language that is compiled at run time like Ruby.&lt;/p&gt;
+
+&lt;p&gt;RubyCocoa is a bridge between the Ruby language and the Objective-C needed by Cocoa. It provides a way to write beautifully coded and beautiful looking Mac OS X applications with the same behaviors and appearances as native Mac applications.&lt;/p&gt;
+
+&lt;h2 id='introduction'&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;The Ruby language has seen a resurgence in its popularity over the last few years because of popular web frameworks like Ruby On Rails (RoR) and Merb. Having a background in RoR, RubyCocoa provides a straightforward way of transitioning to Mac OS X development. Cocoa is a Model, View and Controller framework not unlike Ruby on Rails. I will explain the concept of Model-View-Controller architecture, talk about why the Ruby On Rails framework is so popular and show how to use the same architecture concepts to create beautiful MAC OSX applications with Ruby Cocoa.&lt;/p&gt;
+
+&lt;p&gt;I will also give a basic introduction on how to use the Cocoa framework with Ruby Cocoa using XCode and Interface Builder. The application that is referred to in this paper is called MovieStore and was the project for COMP 120 Databases course at Tufts. The code is hosted at http://github.com/wmernagh/MovieStore.&lt;/p&gt;
+
+&lt;h2 id='model_view_controller'&gt;Model View Controller&lt;/h2&gt;
+
+&lt;p&gt;The purpose of the MVC framework is to separate concerns in order to make development and maintenance less challenging. It separates the business logic and data from the presentation of data in the user interface.&lt;/p&gt;
+
+&lt;p&gt;The &lt;strong&gt;Model&lt;/strong&gt; is the representation of the applications data. All persistent data becomes part of the model. The model also provides an interface to access the data and handles the retrieval and persistence of the data (the business logic of the application). The model is unaware of how the data will be displayed in the User Interface (UI). It just provides ways to access, and modify it. In most applications all classes of data will provide basic CRUD (Create, Retrieve, Update, Destroy) operations.&lt;/p&gt;
+
+&lt;p&gt;The &lt;strong&gt;View&lt;/strong&gt; is the presentation logic of the application. The view retrieves data from the model and renders it in the UI. It also provides a UI for modifying data and sends modified data back to the Model. It is not concerned with checking the validity of the data just with presenting it to the user. Nor is the view concerned with any other business logic. If the business logic changes in the model it will not affect the view which just presents whatever data it can retrieve. There can be multiple views for a single model, each one presenting the data in a different ways (i.e. a photo application may present an album as a list of thumbs, a slide show, etc.)&lt;/p&gt;
+
+&lt;p&gt;The &lt;strong&gt;Controller&lt;/strong&gt; provides the connection between the model and the view. All application requests are sent through the controller. The controller retrieves the correct data from the model based on the view to be rendered. It will also determine which view to display based on the action requested and the requester.&lt;/p&gt;
+
+&lt;h2 id='ruby_on_rails'&gt;Ruby on Rails&lt;/h2&gt;
+
+&lt;p&gt;Ruby on Rails has become a very popular web development framework. It is a MVC framework that preaches the philosophy of &amp;#8220;Convention over Configuration&amp;#8221; CoC and the principle of &amp;#8220;Don&amp;#8217;t Repeat Yourself&amp;#8221; DRY. The CoC means that a developer only needs to specify non-conventional parts of their application. For example, an application with a Movie model will have a table called Movies in the database. If the table was called videos then the developer would have to specify that but the convention expects movies (pluralization of the Model name). It encourages the MVC framework by providing the developer with the skeleton of an MVC application and a scaffolding mechanism. The scaffold will generate the Model, Controller and CRUD views needed. All that developer is required to do is specify the attributes of the model.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;  &lt;span class='nv'&gt;$ &lt;/span&gt;ruby ./script/generate scaffold Actor first_name:string &lt;span class='se'&gt;\&lt;/span&gt;
+  last_name:string dob:date
+  exists  app/models/
+  exists  app/controllers/
+  exists  app/helpers/
+  create  app/views/actors
+  exists  app/views/layouts/
+  exists  &lt;span class='nb'&gt;test&lt;/span&gt;/functional/
+  exists  &lt;span class='nb'&gt;test&lt;/span&gt;/unit/
+  exists  &lt;span class='nb'&gt;test&lt;/span&gt;/unit/helpers/
+  exists  public/stylesheets/
+  create  app/views/actors/index.html.erb
+  create  app/views/actors/show.html.erb
+  create  app/views/actors/new.html.erb
+  create  app/views/actors/edit.html.erb
+  create  app/views/layouts/actors.html.erb
+  identical  public/stylesheets/scaffold.css
+  create  app/controllers/actors_controller.rb
+  create  &lt;span class='nb'&gt;test&lt;/span&gt;/functional/actors_controller_test.rb
+  create  app/helpers/actors_helper.rb
+  create  &lt;span class='nb'&gt;test&lt;/span&gt;/unit/helpers/actors_helper_test.rb
+  route  map.resources :actors
+  dependency  model
+  exists    app/models/
+  exists    &lt;span class='nb'&gt;test&lt;/span&gt;/unit/
+  exists    &lt;span class='nb'&gt;test&lt;/span&gt;/fixtures/
+  create    app/models/actor.rb
+  create    &lt;span class='nb'&gt;test&lt;/span&gt;/unit/actor_test.rb
+  create    &lt;span class='nb'&gt;test&lt;/span&gt;/fixtures/actors.yml
+  exists    db/migrate
+  create    db/migrate/20100411200441_create_actors.rb
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Once the scaffolding is in place for all models the developer can add the business logic to each model (validations and associations). That then just leaves UI design and some tweaking. Rails also offers conventions for implementing the necessary validations and associations.&lt;/p&gt;
+
+&lt;h4 id='associations'&gt;Associations&lt;/h4&gt;
+
+&lt;p&gt;Connecting models together logically. e.g. A movie can have many actors and an actor can be in many movies. So there is an obvious many-to-many relationship. The convention in Rails would be to have three tables representing the models movies and actors, as well as a table to associate them together called actors_movies. Then two classes called Movie and Actor are updated as follows in order to make the association.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;  &lt;span class='k'&gt;class&lt;/span&gt; &lt;span class='nc'&gt;Movie&lt;/span&gt; &lt;span class='o'&gt;&amp;lt;&lt;/span&gt; &lt;span class='no'&gt;ActiveRecord&lt;/span&gt;&lt;span class='o'&gt;::&lt;/span&gt;&lt;span class='no'&gt;Base&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;  &lt;span class='n'&gt;has_and_belongs_to_many&lt;/span&gt; &lt;span class='ss'&gt;:actors&lt;/span&gt;
+  &lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;  &lt;span class='k'&gt;class&lt;/span&gt; &lt;span class='nc'&gt;Actor&lt;/span&gt; &lt;span class='o'&gt;&amp;lt;&lt;/span&gt; &lt;span class='no'&gt;ActiveRecord&lt;/span&gt;&lt;span class='o'&gt;::&lt;/span&gt;&lt;span class='no'&gt;Base&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;  &lt;span class='n'&gt;has_and_belongs_to_many&lt;/span&gt; &lt;span class='ss'&gt;:movies&lt;/span&gt;
+  &lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The attributes of a model are determined by doing an SQL show command on the DB. This is done behind the scenes and the developer need not be concerned with it. The schema from the scaffold command above will look like the following.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;  movies   actors       &lt;span class='nv'&gt;actors_movies&lt;/span&gt;
+  &lt;span class='o'&gt;================================&lt;/span&gt;
+  id       id           actor_id
+  title    first_name   movie_id
+  year     last_name   
+  genre    dob
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Now the code to access attributes of the models and their associations is nice and simple.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;  &lt;span class='n'&gt;a_movie&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='no'&gt;Movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;new&lt;/span&gt;
+  &lt;span class='n'&gt;a_movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;title&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='s1'&gt;&amp;#39;Avatar&amp;#39;&lt;/span&gt;
+  &lt;span class='n'&gt;a_movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;year&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='s1'&gt;&amp;#39;2009&amp;#39;&lt;/span&gt;
+  &lt;span class='n'&gt;a_movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;save&lt;/span&gt;
+
+  &lt;span class='n'&gt;an_actor&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='no'&gt;Actor&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;new&lt;/span&gt;
+  &lt;span class='n'&gt;an_actor&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;first_name&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='s1'&gt;&amp;#39;Peter&amp;#39;&lt;/span&gt;
+  &lt;span class='n'&gt;an_actor&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;last_name&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='s1'&gt;&amp;#39;Smith&amp;#39;&lt;/span&gt;
+  &lt;span class='n'&gt;an_actor&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;save&lt;/span&gt;
+
+  &lt;span class='n'&gt;a_movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;actors&lt;/span&gt; &lt;span class='c1'&gt;#=&amp;gt; []&lt;/span&gt;
+
+  &lt;span class='n'&gt;a_movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;actors&lt;/span&gt; &lt;span class='o'&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class='n'&gt;an_actor&lt;/span&gt;
+  &lt;span class='n'&gt;a_movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;actors&lt;/span&gt; &lt;span class='c1'&gt;#=&amp;gt; [&amp;lt;Actor first_name =&amp;gt; &amp;#39;Peter&amp;#39;...&amp;gt;]&lt;/span&gt;
+
+  &lt;span class='n'&gt;a_movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;actors&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;first&lt;/span&gt; &lt;span class='o'&gt;==&lt;/span&gt; &lt;span class='n'&gt;an_actor&lt;/span&gt; &lt;span class='c1'&gt;#=&amp;gt; true&lt;/span&gt;
+  &lt;span class='n'&gt;an_actor&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;movies&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;first&lt;/span&gt; &lt;span class='o'&gt;==&lt;/span&gt; &lt;span class='n'&gt;a_movie&lt;/span&gt; &lt;span class='c1'&gt;#=&amp;gt; true &lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id='validations'&gt;Validations &lt;/h4&gt;
+
+&lt;p&gt;Validations are used to ensure that all data is present and in the correct format prior to persisting it. Rails provides the developer with tools to easily validate their models prior to persisting them. This, a long with the association tools sown above, abstracts the persistence layer out of the code (For the most part - for performance the developer will need to have some knowledge of the underlying DB. Although with the upcoming Rails 3 and &lt;a href='http://github.com/rails/arel'&gt;Arel&lt;/a&gt; that will change for the better by ). &lt;/p&gt;
+
+&lt;p&gt;Updating the model code above to apply some validation&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;  &lt;span class='k'&gt;class&lt;/span&gt; &lt;span class='nc'&gt;Actor&lt;/span&gt; &lt;span class='o'&gt;&amp;lt;&lt;/span&gt; &lt;span class='no'&gt;ActiveRecord&lt;/span&gt;&lt;span class='o'&gt;::&lt;/span&gt;&lt;span class='no'&gt;Base&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='n'&gt;has_and_belongs_to_many&lt;/span&gt; &lt;span class='ss'&gt;:movies&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='n'&gt;validates_presence_of&lt;/span&gt; &lt;span class='ss'&gt;:first_name&lt;/span&gt;&lt;span class='p'&gt;,&lt;/span&gt; &lt;span class='ss'&gt;:last_name&lt;/span&gt;&lt;span class='p'&gt;,&lt;/span&gt; &lt;span class='ss'&gt;:dob&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='n'&gt;validates_uniqueness_of&lt;/span&gt; &lt;span class='ss'&gt;:first_name&lt;/span&gt;&lt;span class='p'&gt;,&lt;/span&gt; &lt;span class='ss'&gt;:scope&lt;/span&gt; &lt;span class='o'&gt;=&amp;gt;&lt;/span&gt; &lt;span class='ss'&gt;:last_name&lt;/span&gt;
+  &lt;span class='k'&gt;end&lt;/span&gt;
+  
+  &lt;span class='k'&gt;class&lt;/span&gt; &lt;span class='nc'&gt;Movie&lt;/span&gt; &lt;span class='o'&gt;&amp;lt;&lt;/span&gt; &lt;span class='no'&gt;ActiveRecord&lt;/span&gt;&lt;span class='o'&gt;::&lt;/span&gt;&lt;span class='no'&gt;Base&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='n'&gt;has_and_belongs_to_many&lt;/span&gt; &lt;span class='ss'&gt;:actors&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='n'&gt;validates_presence_of&lt;/span&gt; &lt;span class='ss'&gt;:title&lt;/span&gt;&lt;span class='p'&gt;,&lt;/span&gt; &lt;span class='ss'&gt;:year&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='n'&gt;validates_uniqueness_of&lt;/span&gt; &lt;span class='ss'&gt;:title&lt;/span&gt;&lt;span class='p'&gt;,&lt;/span&gt; &lt;span class='ss'&gt;:scope&lt;/span&gt; &lt;span class='o'&gt;=&amp;gt;&lt;/span&gt; &lt;span class='ss'&gt;:year&lt;/span&gt;
+  &lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Validations are run whenever a persistence method is called (create, create!, update, update!, save, save!, etc.). For each persistence method there are two forms (e.g. create and create!). The methods followed by an ! will throw an Exception if the validation fails and rollback the current transaction. The methods without the ! will return true if valid, or false if invalid and rollback the current transaction. &lt;/p&gt;
+
+&lt;p&gt;All ActiveRecord inherited models have a reference to their ActiveRecord::Errors object. This object gets updated with the validation errors that resulted form calling the above methods. This can then be used to inform the user as to what the reason for the failed method call was. Each validation has a specific error message which can be overwritten either in the declaration of the validation (not recommended) or in a localization file.&lt;/p&gt;
+
+&lt;h4 id='embedded_ruby_erb'&gt;Embedded Ruby (.erb)&lt;/h4&gt;
+
+&lt;p&gt;The views in Rails can contain embedded ruby code similar to PHP and ASP. The code is surrounded by &amp;lt;% %&amp;gt; or &amp;lt;%= %&amp;gt;. The former is used for code that does not return text and the latter is used for writing text to the page.&lt;/p&gt;
+
+&lt;p&gt;Here is a simple example of how to print the actors in a movie. (taken from the show.html.erb file)&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='erb'&gt;&lt;span class='x'&gt;  &amp;lt;ul&amp;gt;&lt;/span&gt;
+&lt;span class='x'&gt;  &lt;/span&gt;&lt;span class='cp'&gt;&amp;lt;%&lt;/span&gt; &lt;span class='vi'&gt;@movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;actors&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;each&lt;/span&gt; &lt;span class='k'&gt;do&lt;/span&gt; &lt;span class='o'&gt;|&lt;/span&gt;&lt;span class='n'&gt;actor&lt;/span&gt;&lt;span class='o'&gt;|&lt;/span&gt; &lt;span class='cp'&gt;%&amp;gt;&lt;/span&gt;&lt;span class='x' /&gt;
+&lt;span class='x'&gt;    &amp;lt;li&amp;gt;&lt;/span&gt;&lt;span class='cp'&gt;&amp;lt;%=&lt;/span&gt; &lt;span class='n'&gt;actor&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;last_name&lt;/span&gt; &lt;span class='cp'&gt;%&amp;gt;&lt;/span&gt;&lt;span class='x'&gt;, &lt;/span&gt;&lt;span class='cp'&gt;&amp;lt;%=&lt;/span&gt; &lt;span class='n'&gt;actor&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;first_name&lt;/span&gt; &lt;span class='cp'&gt;%&amp;gt;&lt;/span&gt;&lt;span class='x'&gt;&amp;lt;/li&amp;gt;&lt;/span&gt;
+&lt;span class='x'&gt;  &lt;/span&gt;&lt;span class='cp'&gt;&amp;lt;%&lt;/span&gt; &lt;span class='k'&gt;end&lt;/span&gt; &lt;span class='cp'&gt;%&amp;gt;&lt;/span&gt;&lt;span class='x' /&gt;
+&lt;span class='x'&gt;  &amp;lt;/ul&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id='actions'&gt;Actions&lt;/h4&gt;
+
+&lt;p&gt;Rails is a &lt;a href='http://en.wikipedia.org/wiki/Representational_State_Transfer'&gt;RESTful&lt;/a&gt; web application framework providing actions to be requested by users (via a browser for example). An action is a controller method that can be executed by a user via some widget in the view or by an API call.&lt;/p&gt;
+
+&lt;p&gt;Execution of an action in a Rails application is called by a request to the the url path with one of  the following HTTP methods (POST, GET, DELETE, PUT). For the action to be called the view needs to provide a submit button, a link, or some JavaScript callback to send a request to a path on the server. &lt;/p&gt;
+
+&lt;p&gt;In rails the convention for controllers is to have the following actions (you can add more by creating a public method and updating the routes.yml file)&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='bash'&gt;        
+          Controller  Route 
+  Action  Method      Path                  Example Path       HTTP &lt;span class='nv'&gt;Method&lt;/span&gt;
+  &lt;span class='o'&gt;========================================================================&lt;/span&gt;
+  index   index       :controller/          /movies/          GET
+  show    show        :controller/:id       /movies/2192      GET
+  new     new         :controller/new       /movies/new       GET
+  create  create      :controller/          /movies/          POST
+  edie    edit        :controller/:id/edit  /movies/2192/edit GET
+  update  update      :controller/:id       /movies/2192      PUT
+  delete  destroy     :controller/:id       /movies/2192      DELETE
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;In the running example if we wanted to see the details of the movie &amp;#8220;Avatar&amp;#8217; we would enter the path &amp;#8216;/movies/2192&amp;#8217; into our browser (the full url would look something like http://www.example.com/movies/2192) where &amp;#8216;Avatar&amp;#8217; has the id &lt;em&gt;2192&lt;/em&gt; in the database.&lt;/p&gt;
+
+&lt;p&gt;If the above path is called with a GET request it will then be routed to the controller MoviesController and to the show action. Again this is because of convention.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;  &lt;span class='k'&gt;def&lt;/span&gt; &lt;span class='nf'&gt;show&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='vi'&gt;@movie&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='no'&gt;Movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;find&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='n'&gt;params&lt;/span&gt;&lt;span class='o'&gt;[&lt;/span&gt;&lt;span class='ss'&gt;:id&lt;/span&gt;&lt;span class='o'&gt;]&lt;/span&gt;&lt;span class='p'&gt;)&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='n'&gt;respond_to&lt;/span&gt; &lt;span class='k'&gt;do&lt;/span&gt; &lt;span class='o'&gt;|&lt;/span&gt;&lt;span class='nb'&gt;format&lt;/span&gt;&lt;span class='o'&gt;|&lt;/span&gt;
+  &lt;span class='err'&gt;    &lt;/span&gt;&lt;span class='nb'&gt;format&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;html&lt;/span&gt; &lt;span class='c1'&gt;#=&amp;gt; By default this will render show.html.erb&lt;/span&gt;
+  &lt;span class='err'&gt;    &lt;/span&gt;&lt;span class='nb'&gt;format&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;xml&lt;/span&gt;  &lt;span class='p'&gt;{&lt;/span&gt; &lt;span class='n'&gt;render&lt;/span&gt; &lt;span class='ss'&gt;:xml&lt;/span&gt; &lt;span class='o'&gt;=&amp;gt;&lt;/span&gt; &lt;span class='vi'&gt;@movie&lt;/span&gt; &lt;span class='p'&gt;}&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='k'&gt;end&lt;/span&gt;
+  &lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The show action is used to render a particular view and to populate the variables needed by that view. The convention would render a view of the same name as the action. So show.html.erb in this example.&lt;/p&gt;
+
+&lt;p&gt;If the above path is called with a PUT request it will then be routed to the movies controller and to the update action. &lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;  &lt;span class='k'&gt;def&lt;/span&gt; &lt;span class='nf'&gt;update&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='vi'&gt;@movie&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='no'&gt;Movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;find&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='n'&gt;params&lt;/span&gt;&lt;span class='o'&gt;[&lt;/span&gt;&lt;span class='ss'&gt;:id&lt;/span&gt;&lt;span class='o'&gt;]&lt;/span&gt;&lt;span class='p'&gt;)&lt;/span&gt;
+   
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='n'&gt;respond_to&lt;/span&gt; &lt;span class='k'&gt;do&lt;/span&gt; &lt;span class='o'&gt;|&lt;/span&gt;&lt;span class='nb'&gt;format&lt;/span&gt;&lt;span class='o'&gt;|&lt;/span&gt;
+  &lt;span class='err'&gt;    &lt;/span&gt;&lt;span class='k'&gt;if&lt;/span&gt; &lt;span class='vi'&gt;@movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;update_attributes&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='n'&gt;params&lt;/span&gt;&lt;span class='o'&gt;[&lt;/span&gt;&lt;span class='ss'&gt;:movie&lt;/span&gt;&lt;span class='o'&gt;]&lt;/span&gt;&lt;span class='p'&gt;)&lt;/span&gt;
+  &lt;span class='err'&gt;      &lt;/span&gt;&lt;span class='n'&gt;flash&lt;/span&gt;&lt;span class='o'&gt;[&lt;/span&gt;&lt;span class='ss'&gt;:notice&lt;/span&gt;&lt;span class='o'&gt;]&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='s1'&gt;&amp;#39;Movie was successfully updated.&amp;#39;&lt;/span&gt;
+  &lt;span class='err'&gt;      &lt;/span&gt;&lt;span class='nb'&gt;format&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;html&lt;/span&gt; &lt;span class='p'&gt;{&lt;/span&gt; &lt;span class='n'&gt;redirect_to&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='vi'&gt;@movie&lt;/span&gt;&lt;span class='p'&gt;)&lt;/span&gt; &lt;span class='p'&gt;}&lt;/span&gt;
+  &lt;span class='err'&gt;      &lt;/span&gt;&lt;span class='nb'&gt;format&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;xml&lt;/span&gt;  &lt;span class='p'&gt;{&lt;/span&gt; &lt;span class='n'&gt;head&lt;/span&gt; &lt;span class='ss'&gt;:ok&lt;/span&gt; &lt;span class='p'&gt;}&lt;/span&gt;
+  &lt;span class='err'&gt;    &lt;/span&gt;&lt;span class='k'&gt;else&lt;/span&gt;
+  &lt;span class='err'&gt;      &lt;/span&gt;&lt;span class='nb'&gt;format&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;html&lt;/span&gt; &lt;span class='p'&gt;{&lt;/span&gt; &lt;span class='n'&gt;render&lt;/span&gt; &lt;span class='ss'&gt;:action&lt;/span&gt; &lt;span class='o'&gt;=&amp;gt;&lt;/span&gt; &lt;span class='s2'&gt;&amp;quot;edit&amp;quot;&lt;/span&gt; &lt;span class='p'&gt;}&lt;/span&gt;
+  &lt;span class='err'&gt;      &lt;/span&gt;&lt;span class='nb'&gt;format&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;xml&lt;/span&gt;  &lt;span class='p'&gt;{&lt;/span&gt; &lt;span class='n'&gt;render&lt;/span&gt; &lt;span class='ss'&gt;:xml&lt;/span&gt; &lt;span class='o'&gt;=&amp;gt;&lt;/span&gt; &lt;span class='vi'&gt;@movie&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;errors&lt;/span&gt;&lt;span class='p'&gt;,&lt;/span&gt; 
+          &lt;span class='ss'&gt;:status&lt;/span&gt; &lt;span class='o'&gt;=&amp;gt;&lt;/span&gt; &lt;span class='ss'&gt;:unprocessable_entity&lt;/span&gt; &lt;span class='p'&gt;}&lt;/span&gt;
+  &lt;span class='err'&gt;    &lt;/span&gt;&lt;span class='k'&gt;end&lt;/span&gt;
+  &lt;span class='err'&gt;  &lt;/span&gt;&lt;span class='k'&gt;end&lt;/span&gt;
+  &lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The path &amp;#8216;/movies/2192.xml&amp;#8217; would map to the same actions but would return the movie model as xml.&lt;/p&gt;
+
+&lt;p&gt;Not all methods in a controller are actions. To be considered an action a controller method must be public and there must be a path defined in the routes.yml file that maps to it. It is good practice to have all non action methods be private or protected.&lt;/p&gt;
+
+&lt;p&gt;The controller passes data between Model and View in two ways. When a action is requested it connects data set in the View with the Model by reading parameters in the session (these get added to the params hash). It then connects data in the Model for use by the View by setting instance variables.&lt;/p&gt;
+
+&lt;h2 id='skinny_controllers_and_fat_models'&gt;Skinny Controllers and Fat Models&lt;/h2&gt;
+
+&lt;p&gt;Another principle that is popular in the Rails community is Skinny Controllers and Fat Models. This refers to the idea that most of the logic should be in the Models, cleaning up the Controller code allowing for grater code reuse. This principle is valid for all MVC applications not just the Rails framework. New developers tend to start with logic in the View, then move it to the controllers and finally as they get familiar with the benefits of the MVC framework they move it down to the Model. &lt;/p&gt;
+
+&lt;h2 id='the_cocoa_framework'&gt;The Cocoa Framework&lt;/h2&gt;
+
+&lt;p&gt;The Cocoa Framework also encourages the MVC pattern. It includes a graphical view builder called Interface Builder which can be used to create the View of the application. This can be done without any code allowing you to focus directly on the User Interface. The framework also provides a mechanism called bindings to connect your View to the controllers coded in Objective-C or Ruby. This is also a simple graphical step of dragging a &amp;#8220;wire&amp;#8221; from the one controller action to an object/widget in the view.  &lt;/p&gt;
+
+&lt;p&gt;To create a new project open XCode -&amp;gt; New Project&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt='New Project' src='http://farm2.static.flickr.com/1155/5100709046_c0379508c6.jpg' /&gt;&lt;/p&gt;
+
+&lt;p&gt;Select Cocoa-Ruby Application and click &amp;#8216;Choose&amp;#8230;&amp;#8217; name the project &amp;#8216;Movies&amp;#8217; and the following window will open.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt='Choose' src='http://farm2.static.flickr.com/1387/5100709096_96d0ce8642.jpg' /&gt;&lt;/p&gt;
+
+&lt;h4 id='the_view'&gt;The View&lt;/h4&gt;
+
+&lt;p&gt;As mentioned above the View can be created using the a graphical tool called Interface Builder.  To open Interface Builder simply double click on the .nib file that is in XCode (It is named MainMenu.nib by default but can be renamed if wanted). &lt;/p&gt;
+
+&lt;p&gt;&lt;img alt='Interface Builder' src='http://farm2.static.flickr.com/1050/5100709134_c00c67ef62.jpg' /&gt;&lt;/p&gt;
+
+&lt;p&gt;Interface Builder will open with 5 windows (show above). The AppKit Library (left), Document Window (top center), Inspector (right), The applications menu (center), and the applications window (bottom center).&lt;/p&gt;
+
+&lt;p&gt;The AppKit is a library of all the application widgets you will need (windows, panels, text boxes, tables, buttons, etc.). These objects can be dragged from the library into the application window.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt='AppKit' src='http://farm2.static.flickr.com/1359/5100111171_d201d33949.jpg' /&gt;&lt;/p&gt;
+
+&lt;p&gt;The figure below shows how you would drag a button widget from the library to a window, place it beside a password text field and edit it to say &amp;#8216;Login&amp;#8217;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt='widgets' src='http://farm2.static.flickr.com/1322/5100111269_db146b2f2d.jpg' /&gt;&lt;/p&gt;
+
+&lt;p&gt;In order to create your applications View you can add the needed widgets, position and edit them (size, style, etc.). The AppKit will have all the widgets that you could need including nice table widgets that handle sorting, in-line cell editing, etc.  &lt;/p&gt;
+
+&lt;p&gt;The one major downside to Interface Builder is that if you layer objects on top of each other it makes modifying the underlying objects difficult. You actually have to remove the object from the View that are on top of the object you would like to edit.&lt;/p&gt;
+
+&lt;h4 id='the_controller'&gt;The Controller&lt;/h4&gt;
+
+&lt;p&gt;The controller will be used to marshal the view, retrieve data from the model layer for the view, and to pass data from the view to the model layer. This adheres to the MVC architecture described earlier. To create a controller select File -&amp;gt; New File in Xcode, then click on the Ruby NSObject subclass option and click Next and name your controller (e.g. ApplicationController)&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt='New File' src='http://farm2.static.flickr.com/1104/5100111301_58ee4a9f93.jpg' /&gt;&lt;/p&gt;
+
+&lt;p&gt;This will generate the following code&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;  &lt;span class='nb'&gt;require&lt;/span&gt; &lt;span class='s1'&gt;&amp;#39;osx/cocoa&amp;#39;&lt;/span&gt;
+
+  &lt;span class='k'&gt;class&lt;/span&gt; &lt;span class='nc'&gt;ApplicationController&lt;/span&gt; &lt;span class='o'&gt;&amp;lt;&lt;/span&gt; &lt;span class='no'&gt;OSX&lt;/span&gt;&lt;span class='o'&gt;::&lt;/span&gt;&lt;span class='no'&gt;NSObject&lt;/span&gt;
+  &lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Like Rails, Cocoa controllers will need to define actions. Unlike Rails where actions were defined by pubic methods in the Controller and a matching route in the routes.yml file, Cocoa controller actions are defined explicitly within the controller. This difference is due to the difference in the application space. Rails is a Web framework so needs to define actions accessible via a route, while Cocoa is a Desktop framework which does not.&lt;/p&gt;
+
+&lt;p&gt;To define the actions you will need a public method with an extra definition above it. In the running example we need a login action, it can be defined as follows.&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;  &lt;span class='nb'&gt;require&lt;/span&gt; &lt;span class='s1'&gt;&amp;#39;osx/cocoa&amp;#39;&lt;/span&gt;
+  
+  &lt;span class='k'&gt;class&lt;/span&gt; &lt;span class='nc'&gt;ApplicationController&lt;/span&gt; &lt;span class='o'&gt;&amp;lt;&lt;/span&gt; &lt;span class='no'&gt;OSX&lt;/span&gt;&lt;span class='o'&gt;::&lt;/span&gt;&lt;span class='no'&gt;NSObject&lt;/span&gt;
+  
+     &lt;span class='n'&gt;ib_action&lt;/span&gt; &lt;span class='ss'&gt;:login&lt;/span&gt;
+     &lt;span class='k'&gt;def&lt;/span&gt; &lt;span class='nf'&gt;login&lt;/span&gt; 
+       &lt;span class='c1'&gt;# Do login here&lt;/span&gt;
+     &lt;span class='k'&gt;end&lt;/span&gt;
+  
+  &lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The extra definition is called ib_action which stands for Interface Builder action. This one line will make the action visible in Interface Builder.&lt;/p&gt;
+
+&lt;p&gt;The next step is to connect the the login button in the view to the login action in the controller. In Rails this would be done by having the button either call a JS function, a link, or form submit button, that requests the correct path with the correct HTTP method. In Cocoa we use graphical wiring (called bindings) in Interface Builder.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt='Document Window' src='http://farm2.static.flickr.com/1155/5100111353_55dd821e3f.jpg' /&gt;&lt;/p&gt;
+
+&lt;p&gt;Going back to Interface Builder select the Classes tab from the Library Window, type in the name of the controller you just created and drag that controller into the Document Window. &lt;/p&gt;
+
+&lt;p&gt;Once the controller is in the Document Window you can select it and access its actions in the Inspector. Click and hold the mouse button on the circle beside an action you then drag it to a widget in the View. In the example below we will wire up the Controller&amp;#8217;s login action with the View&amp;#8217;s login button.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt='Wiring' src='http://farm2.static.flickr.com/1233/5100709398_60cb71df68.jpg' /&gt;&lt;/p&gt;
+
+&lt;p&gt;The login button should flash showing you the connection worked and you can see the connection in the Inspector afterward.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt='wired' src='http://farm5.static.flickr.com/4084/5100111409_e2cd144ca7.jpg' /&gt;&lt;/p&gt;
+
+&lt;p&gt;You can connect multiple widgets to an action. So we may also want the user to login by hitting the enter key after typing the password. To do this we wire the text field to the login action also.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt='wiring' src='http://farm2.static.flickr.com/1073/5100111447_f38ed40647.jpg' /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now that the actions are connected to the view there is still one more connection that needs to be made. In order for the controllers to pass data between View and Model there needs to be a set of variables associated with the view that can be accessed by the controller. &lt;/p&gt;
+
+&lt;p&gt;In Rails this was done in two ways depending on the flow of the data (the params hash gets set for sending data from the View to the Controller and instance variables are set for sending data from the Controller to the View.)&lt;/p&gt;
+
+&lt;p&gt;In Cocoa we create outlets in the controller that we can connect to widgets in the view. In our running example we will need a connect the Employee ID and the Password text fields to the ApplicationController so that the login Action can check their values. &lt;/p&gt;
+
+&lt;p&gt;Outlets are added in the controller similar to actions and they can be accessed in the controller as instance variables.&lt;/p&gt;
+
+&lt;p&gt;require &amp;#8216;osx/cocoa&amp;#8217;&lt;/p&gt;
+&lt;div class='highlight'&gt;&lt;pre&gt;&lt;code class='ruby'&gt;   &lt;span class='k'&gt;class&lt;/span&gt; &lt;span class='nc'&gt;ApplicationController&lt;/span&gt; &lt;span class='o'&gt;&amp;lt;&lt;/span&gt; &lt;span class='no'&gt;OSX&lt;/span&gt;&lt;span class='o'&gt;::&lt;/span&gt;&lt;span class='no'&gt;NSObject&lt;/span&gt;
+  &lt;span class='n'&gt;ib_outlets&lt;/span&gt; &lt;span class='ss'&gt;:login_username&lt;/span&gt;&lt;span class='p'&gt;,&lt;/span&gt; &lt;span class='ss'&gt;:login_password&lt;/span&gt;
+ 
+  &lt;span class='n'&gt;ib_action&lt;/span&gt; &lt;span class='ss'&gt;:login&lt;/span&gt;
+  &lt;span class='k'&gt;def&lt;/span&gt; &lt;span class='nf'&gt;login&lt;/span&gt; 
+      &lt;span class='n'&gt;employee&lt;/span&gt; &lt;span class='o'&gt;=&lt;/span&gt; &lt;span class='no'&gt;Employee&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;find_by_id&lt;/span&gt;&lt;span class='p'&gt;(&lt;/span&gt;&lt;span class='vi'&gt;@login_username&lt;/span&gt;&lt;span class='o'&gt;.&lt;/span&gt;&lt;span class='n'&gt;stringValue_&lt;/span&gt;&lt;span class='p'&gt;)&lt;/span&gt;
+      &lt;span class='c1'&gt;# Do login here&lt;/span&gt;
+  &lt;span class='k'&gt;end&lt;/span&gt;
+   &lt;span class='k'&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Also note that there are some peculiarities when bridging form Objective-C to Ruby, for example to retrieve the string value of the outlet we use the stringValue method. Similarly when we want to set the value of a outlet we use the setStringValue method. Ruby developers may have expected that the @login_username would be cast to string by default but this is not the case.&lt;/p&gt;
+
+&lt;p&gt;Now we need to wire the outlets to the View using Interface Builder. This is done in the same way that we bound the actions to the view.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt='wiring' src='http://farm2.static.flickr.com/1142/5100111493_cd05fb1e50.jpg' /&gt;&lt;/p&gt;
+
+&lt;p&gt;The difference between Rails and Cocoa in how they share data is somewhat due to the differences between Web and Desktop applications as well as having to integrate with Interface Builder.&lt;/p&gt;
+
+&lt;h4 id='the_model'&gt;The Model&lt;/h4&gt;
+
+&lt;p&gt;The model layer in Ruby Cocoa can be also take advantage of Rails. Rails uses the ActiveRecord Gem for its model layer. Ruby Cocoa developers can include this gem and use ActiveRecord also. This will provide all the validation, error, and association tools that were mentioned in the Rails section above.&lt;/p&gt;
+
+&lt;h4 id='cocoa_api'&gt;Cocoa API&lt;/h4&gt;
+
+&lt;p&gt;When using the Cocoa API with Ruby most of the functions that are available in Objective-C are also available in Ruby. The naming convention is to call the same method in Ruby with a trailing underscore. Some examples are&lt;/p&gt;
+
+&lt;p&gt;deselectAll_ setHidden_ reloadData_ setStringValue_ stringValue_ tableView_objectValueForTableColumn_row_(view, col, row) tableViewSelectionDidChange_(notification) numberOfRowsInTableView_(view)&lt;/p&gt;
+
+&lt;h2 id='conclusion'&gt;Conclusion&lt;/h2&gt;
+
+&lt;h4 id='mvc'&gt;MVC&lt;/h4&gt;
+
+&lt;p&gt;Both Rails and Cocoa provide a developer with good tools to begin programming maintainable applications by separating concerns. The developer is still required to adhere to the principle of Skinny Controllers and Fat Models to ensure the correct levels of modularization. Logic that slips into the Controller or View will be hard to locate and thus maintain. It will also lead to possible code duplication. By moving the logic down to the Model the code becomes more DRY.&lt;/p&gt;
+
+&lt;h4 id='mac_os_x_development'&gt;Mac OS X Development&lt;/h4&gt;
+
+&lt;p&gt;Ruby comes installed on all new Macs so developing applications in RubyCocoa should ensure that your application will work on them. Developers who utilize Ruby gems will need to package the gems with the code since it is unlikely that potential users will have the correct gems installed.&lt;/p&gt;
+
+&lt;p&gt;RubyCocoa was an open source project started separately from Apple. Apple has since started work on a similar project called MacRuby and HotCocoa. MacRuby is version of Ruby 1.9 ported to run directly on top of core technologies such as Objective-C. HotCocoa is a thin &amp;amp; idiomatic Ruby layer that sits above Cocoa and other frameworks. MacRuby 0.5 now supports &lt;a href='http://www.macruby.org/blog/2010/01/31/macruby05.html'&gt;HotCocoa&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;HotCocoa used to be developed inside the MacRuby project, it has since been moved to GitHub, where it is far easier for developers to submit contributions.&lt;/p&gt;
+
+&lt;p&gt;Developers can sign up to the developer connection at Apple for free and download the Cocoa SDK (XCode, Interface Builder, etc.) Rails is also installed on Mac OS X when you install the developer add-ons. &lt;/p&gt;
+
+&lt;h4 id='objectivec_the_next_step'&gt;Objective-C the next step&lt;/h4&gt;
+
+&lt;p&gt;It can often be hard for developers to start work in new environments and with new languages. For developers switching to Mac development and using Objective-C for the first time the learning curve is even steeper. Not only is there a new set of tools (Xcode, Interface Builder, etc.) to become familiar with but also a new language.&lt;/p&gt;
+
+&lt;p&gt;However for Ruby developers especially those familiar with Rails there is a nice interim step that can be taken. Developers can create an application with RubyCocoa, learning the framework and the tools used. Then once proficient with these new technologies they can easily transition to building applications with Objective-C.&lt;/p&gt;
+
+&lt;h4 id='iphone_development'&gt;iPhone Development&lt;/h4&gt;
+
+&lt;p&gt;Unfortunately the iPhone cannot take advantage of RubyCocoa since the iPhone OS does not have Ruby installed. Perhaps when MacRuby comes out of beta we will see it but until then Objective-C is required to develop applications on the iPhone.&lt;/p&gt;
+
+&lt;p&gt;Bibliography &lt;a href='http://www.rubycocoa.com/an-introduction-to-rubycocoa/'&gt;Programming Cocoa with Ruby – Brian Marick – prag prog – 2009&lt;/a&gt;&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Instapaper Is My Kindle's Best Friend</title>
+   <link href="http://will.willandorla.com/2010/03/Instapaper-is-my-Kindle%27s-best-friend"/>
+   <updated>2010-03-22T00:00:00-04:00</updated>
+   <id>http://will.willandorla.com/2010/03/Instapaper-is-my-Kindle's-best-friend</id>
+   <content type="html">&lt;p&gt;Instapaper started out as a simple idea. A site to store articles for reading at a later time. Basically you bookmark articles on their site, then go there when you have some free time and catch up. There is a handy bookmarklet you can add to you browsers bookmark bar. When you are on any webpage of interest just click the &amp;#8220;Read Later&amp;#8221; bookmark and it saves the site for future reading.&lt;/p&gt;
+&lt;p&gt;I used to keep sites I wanted to read later in a folder in my bookmarks. I rarely removed articles from there so this grew large and messy in no time. Instapaper actually removes the articles you have read after you read them. If you want to keep interesting ones then you can just &amp;#8220;Star&amp;#8221; them too. This is a much better way of staying organized.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://farm5.static.flickr.com/4056/4459693000_922927d7fd.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Why use it? Well I know I have a problem when online where I&amp;#8217;ll be reading something on Wikipedia or another site and before I know it I have moved 10 sites deep from links.&lt;/p&gt;
+Wiki &amp;#8594; World Cup 2010 &amp;#8594; Beckam Injures Leg &amp;#8594; Scandinavian Therapies &amp;#8594; Scandinavian Women.
+&lt;p&gt;Some of the pages along the way are interesting and I always mean to go back someday. Or else I find myself actually spending hours online reading each page. This is &lt;em&gt;very&lt;/em&gt; unproductive. Enter Instapaper. I can just click the link hit &amp;#8220;read later&amp;#8221; and know I will get to it at some stage.&lt;/p&gt;
+&lt;p&gt;This is especially handy at work when you are looking for a good book/tutorial on some new technology but get distracted along the way by an interesting blog post.&lt;/p&gt;
+&lt;p&gt;Now where does my Kindle come into this you may be asking. Well Instapaper has the ability to email a Kindle formatted version of all the articles you marked as to read over the last week. The file works like a newspaper with each page you marked as &amp;#8220;Read Later&amp;#8221; an article. So you can skip to the next article simply. You can also go to Instapaper and have them send you the file at any time. Now since sending the files to your Kindle costs a few cents there is even an option to not send the file if it contains less than a set number of articles. You can also download it for transfer via &lt;span class=&quot;caps&quot;&gt;USB&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://farm5.static.flickr.com/4038/4459693070_fcf74f2f69.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;It is really great. You may even use it to read the newspaper based on the online version. Spend a few minutes clicking on the online editions articles of interest, add them to Instapaper, email them to your Kindle and hay presto.&lt;/p&gt;
+&lt;p&gt;I also use Instapaper with Tweetie on my iPhone. When I see an interesting tweet with a link I can hit the built in &amp;#8220;Read Later&amp;#8221; button and it adds it to my Instapaper. It asks you for you password the first time and then remembers it. So I can now get a good tweet at work and not get distracted.&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Using LDAP to authorize svn</title>
+   <link href="http://will.willandorla.com/2008/01/using-ldap-to-authorize-svn"/>
+   <updated>2008-01-29T00:00:00-05:00</updated>
+   <id>http://will.willandorla.com/2008/01/using-ldap-to-authorize-svn</id>
+   <content type="html">&lt;p&gt;This will allow you to specify users in the ldap directory that can be svn authors. They do not need to exist on any server just in &lt;span class=&quot;caps&quot;&gt;LDAP&lt;/span&gt;. Apache will test the user login versus the ldap credentials and then grant access to the repository for that user.&lt;/p&gt;
+&lt;p&gt;with&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;      hosting &lt;span class=&quot;nv&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; ldap.willspics.com
+      repository location on &lt;span class=&quot;nv&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; /opt/svnserve/repos
+      repository location on &lt;span class=&quot;nv&quot;&gt;web&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; http://&amp;lt;server&amp;gt;/svn/repos
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;edit /etc/httpd/conf.d/subversion.conf to contain the following&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;&amp;lt;Location /svn/repos&amp;gt;
+  DAV svn
+  SVNPath /opt/svnserve/repos
+  AuthType Basic
+  AuthName &lt;span class=&quot;s2&quot;&gt;&amp;quot;Authorize Me&amp;quot;&lt;/span&gt;
+  AuthLDAPEnabled on
+  AuthLDAPAuthoritative on
+  AuthLDAPBindDN &lt;span class=&quot;s2&quot;&gt;&amp;quot;CN=Manager,DC=epl,DC=willspics,DC=com&amp;quot;&lt;/span&gt;
+  AuthLDAPBindPassword xxxxxxxxx
+  Options Indexes FollowSymLinks
+  AuthLDAPURL ldap://ldap.xxxserver.com:389/ou&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;people,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;epl,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;xxxserver,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;com?uid?sub?&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;objectClass&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;*&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  Require valid-user
+&amp;lt;/Location&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Setting up LDAP for user authentication</title>
+   <link href="http://will.willandorla.com/2008/01/setting-up-ldap-for-user-authentication"/>
+   <updated>2008-01-29T00:00:00-05:00</updated>
+   <id>http://will.willandorla.com/2008/01/setting-up-ldap-for-user-authentication</id>
+   <content type="html">&lt;p&gt;OpenLDAP was already installed on my server.&lt;/p&gt;
+&lt;p&gt;I started &lt;span class=&quot;caps&quot;&gt;LDAP&lt;/span&gt; by&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;  slapd -h ldap:///
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;&lt;p&gt;I than set it up by&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;  ldapadd -x -h localhost -D &lt;span class=&quot;nv&quot;&gt;cn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Manager,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;epl,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;willspics,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;com -w secret -f users.ldif
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;&lt;p&gt;Where the contents of my users.ldif file is&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;  dn: &lt;span class=&quot;nv&quot;&gt;ou&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;people,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;epl,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;willspics,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;com
+  objectclass: organizationalUnit
+  ou: people
+
+  dn: &lt;span class=&quot;nv&quot;&gt;uid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;wmerna01,ou&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;people,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;epl,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;willspics,dc&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;com
+  cn: Will Mernagh
+  sn: Mernagh
+  givenname: Will
+  objectclass: top
+  objectclass: person
+  objectclass: organizationalPerson
+  objectclass: inetOrgPerson
+  ou: comp190Team2
+  ou: People
+  l: Tufts
+  uid: wmerna01
+  mail: wmerna01@cs.tufts.edu
+  userpassword: xxxxxx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;&lt;p&gt;That is it. I can now browse it using phpLDAPadmin&lt;/p&gt;</content>
+ </entry>
+ 
+ 
+</feed>

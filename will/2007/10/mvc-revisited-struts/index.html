@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>MVC Revisited (Struts)</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/10/mvc-revisited-struts">MVC Revisited (Struts)</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on October 29, 2007
+</div>
+  <p>So after implementing some of my design I wanted to make it more maintainable. I started to read up on some patterns that might help. I was going to use the <a href="http://en.wikipedia.org/wiki/Command_pattern">Command Pattern</a> which certainly would help. While researching this pattern however, I read about the <a href="http://struts.apache.org/">Struts Framework</a> which <a href="http://www.javaworld.com/javaworld/jw-06-2002/jw-0628-designpatterns.html">implements the Command Pattern</a>.</p>
+<p>Here is a diagram of some of my use cases implemented using the <a href="http://struts.apache.org/">Struts Framework</a><br />
+<a href="/cs/erd-1.jpg"><img src="/cs/erd-1.jpg" alt="ERD-1.jpg" border="0" width="550" height="650" /></a></p>
+<p>Here the Actions (the brown boxes) represent the commands. This framework/pattern promotes maintainability and decoupling of concerns. It connects the <em>View</em> with the <em>Model</em>. The Actions represent the <em>Controller</em>.</p>
+<p>This way a website designer can design the front end (View) and not be concerned with how the application is implemented.</p>
+<p>Ref: <a href="http://en.wikipedia.org/wiki/Model-view-controller"><span class="caps">MVC</span></a>, <a href="http://www.oracle.com/technology/sample_code/tech/java/j2ee/jintdemo/tutorials/Struts.html"><span class="caps">MVC</span>/Struts</a></p>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/10/mvc-revisited-struts';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

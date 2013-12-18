@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>How to apply changes to all VIM open buffers</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2011/01/vim-open-into-and-update-all-buffers">How to apply changes to all VIM open buffers</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on January 13, 2011
+</div>
+  <p>A simple way to make modifications to a lot of file is to open all of them in vi and apply the search and replace to every file that is buffered. The easiest way to do this is as follows</p>
+<div class='highlight'><pre><code class='bash'>  :bufdo %s/pattern/substitution/ge | update
+</code></pre>
+</div>
+<p>bufdo – apply to all buffers</p>
+
+<p>e – ignore no pattern match errors in a buffer</p>
+
+<p>update – write only if the files changed</p>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2011/01/vim-open-into-and-update-all-buffers';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

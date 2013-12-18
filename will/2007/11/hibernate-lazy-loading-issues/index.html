@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Hibernate - Lazy loading issues</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/11/hibernate-lazy-loading-issues">Hibernate - Lazy loading issues</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on November 14, 2007
+</div>
+  <p>So I am implementing the DB access via <a href="http://www.hibernate.org">Hibernate</a>. Hibernate makes it easy to persist objects that map to multiple tables. In my case I have a Rounds object that contains Games objects that contains Teams objects. Hibernate allows me to persist a Rounds object and it will automatically persist all the Games objects and create the mapping in the rounds_games table (<a href="/2007/10/31/revised-data-model-erd/">see here for my <span class="caps">ERD</span></a>)</p>
+<p>One of the cool features of Hibernate is when loading a Rounds object from a DB it, <em>by default</em>, does a Lazy load. This lazy loads Rounds but not the members that are persisted in different tables (i.e. Games in my case). Instead it loads a proxy instead. Thus upon calling a Rounds getGames() method Hibernate will then load (via the proxy) the Games. This only works however if you have a hibernate session open. (See ** below for why this may not always be possible)</p>
+<p>This approach is the default because it is much more efficient than loading all table info.</p>
+<p>For example if you were looking for only a number of Rounds objects in a DB and loaded them all to iterate through them and perform some operation on ones that meet a certain requirement. It would be extremely inefficient to load all Rounds objects and all their Games objects and all the Games object&#8217;s Teams objects.</p>
+<p>However for my application I load individual Rounds objects only and I always need the Games objects and Teams objects loaded. I also hide my Hibernate implementation behind a RoundManager DataAccessObject. So when I retrieve the Object from the manager the connection to the DB is closed and the access to the Games members will throw a LazyInitilizationException.</p>
+<p>So I changed the default from lazy=true to lazy=false and it loads all members before returning the Rounds object</p>
+<p>In my Rounds.hbm.xml I now have the following</p>
+<div class="highlight"><pre><code class="xml"><span class="nt">&lt;set</span> <span class="na">name=</span><span class="s">&quot;games&quot;</span> <span class="na">table=</span><span class="s">&quot;rounds_games&quot;</span> <span class="na">cascade=</span><span class="s">&quot;persist,merge,save-update&quot;</span> <span class="na">lazy=</span><span class="s">&quot;false&quot;</span> <span class="nt">&gt;</span>
+    <span class="nt">&lt;key&gt;</span>
+       <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">&quot;round_id&quot;</span> <span class="na">not-null=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/key&gt;</span>
+    <span class="nt">&lt;many-to-many</span> <span class="na">column=</span><span class="s">&quot;game_id&quot;</span> <span class="na">unique=</span><span class="s">&quot;true&quot;</span> <span class="na">class=</span><span class="s">&quot;com.willspics.cs.epl.model.data.Games&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/set&gt;</span>
+</code></pre>
+</div><p>Note also that I had to update the Games.hbm.xml file also so that it did not Lazy load Teams</p>
+<p><small>** This is not always possible because the view may be accessing the Rounds object&#8217;s Games. If the sessions is closed before the view is rendered then there will be a LazyInitilizationException thrown. In many 3-tier applications the view will never be able to have access to the hibernate session. See <a href="http://www.hibernate.org/43.html">this article</a> for some thoughts and ideas about this general issue</small></p>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/11/hibernate-lazy-loading-issues';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

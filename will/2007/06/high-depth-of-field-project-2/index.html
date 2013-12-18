@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>High Depth of Field - Project 2</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/06/high-depth-of-field-project-2">High Depth of Field - Project 2</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on June 16, 2007
+</div>
+  <p><strong>Project Description </strong> In this assignment, you will combine multiple pictures to create a high depth of field image. Optionally you will create special effects.<br />
+    <li>Change depth of field</li><br />
+    <li>Change orientation of slab of focus</li><br />
+<a href="ftp://ftp.merl.com/pub/raskar/Course/02ProgramAssignment.txt"> Full Discription</a><br />
+<strong>My Solution </strong> <!--more-->Taking the following images as input I calculated the variance in each pixel over each image. For each pixel I use the one from the image with the max variance for my final image.</p>
+<p><strong>Input Images</strong> (given data set)<br />
+Note: Right click on any image (ctrl-click on mac) to view its full size</p>
+<p id="flashcontent">     SimpleViewer requires Macromedia Flash.<a href="http://www.macromedia.com/go/getflashplayer/">Get Macromedia Flash.</a><br />
+If you have Flash installed,<br />
+<script type="text/javascript">                             var fo = new SWFObject("/tuftsphoto/viewer.swf", "viewer",  "728", "800", "7", "#ffffff");                     fo.addVariable("xmlDataPath", "/tuftsphoto/SimpleViewerCreator/project2/gallery_manual.xml");                  fo.write("flashcontent");                   </script>
+<br />
+This is the resulting image where all the image is in focus. You will notice that it is not as crisp as the example given in the photomontage paper.<br />
+<br />
+<img src="/tuftsphoto/wp-content/uploads/DoF.jpg" alt="result" width="600" /><br />
+<br />
+Here is the color map of the input images as they are used. The bar on the right shows the colors for image 1 through 13<br />
+<br />
+<img src="/tuftsphoto/wp-content/uploads/colormap.jpg" alt="result" width="600" /><br />
+<br />
+<strong>Input Images</strong> (my data set)<br />
+<br />
+<img src="/tuftsphoto/wp-content/uploads/in1.jpg" alt="input 1" width="600" /><br />
+<br />
+<img src="/tuftsphoto/wp-content/uploads/in2.jpg" alt="input 2" width="600" /><br />
+<br />
+This is the resulting image where all the image is in focus. If you view the full size image you will notice many artifacts (noise like) in the image. This is because when the camera refocuses it also zooms a little, changing the location of the objects.<br />
+<br />
+<img src="/tuftsphoto/wp-content/uploads/DoF1.jpg" alt="result" width="600" /><br />
+<br />
+Here is the color map of the input images as they are used. The bar on the right shows the colors for image 1 through 13<br />
+<br />
+<img src="/tuftsphoto/wp-content/uploads/colormap1.jpg" alt="result" width="600" /><br />
+<br />
+<strong>Special Effect 1</strong><br />
+<br />
+To create the effect of a larger depth of field than any input image (but shorter than the above result) I first created an image that was completely blurry. Then similar to the above solution I take the in focus pixels from the images that will be in the defined depth and the remaining from the blurry image. For example images 5, 6, 7, 8 and 9. This gives me a depth of field larger that any input image.<br />
+<br />
+The blurry image<br />
+<br />
+<img src="/tuftsphoto/wp-content/uploads/blurry.jpg" alt="result" width="600" /><br />
+<br />
+The result<br />
+<br />
+<img src="/tuftsphoto/wp-content/uploads/ExDoF.jpg" alt="result" width="600" /><br />
+<br />
+<strong>Special Effect 2</strong><br />
+To have a change of focus along an angel or slab I take a slice from each of the input image. So the right of the image will be in focus near the front and as you move from right to left the focus shifts from front to back.<br />
+<br />
+The result<br />
+<br />
+<img src="/tuftsphoto/wp-content/uploads/slab.jpg" alt="result" width="600" /><br />
+<br />
+I wrote this <a href="/tuftsphoto/wp-content/uploads/DoF.m.txt">code</a> in matlab to get the above results.
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/06/high-depth-of-field-project-2';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

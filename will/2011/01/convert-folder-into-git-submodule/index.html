@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Convert subfolder into Git submodule</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2011/01/convert-folder-into-git-submodule">Convert subfolder into Git submodule</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on January 13, 2011
+</div>
+  <p>Recently I had the need to refactor a large repository we use at work. The layout of the repository was as follows</p>
+<div class='highlight'><pre><code class='bash'>~ <span class='nv'>$ </span><span class='nb'>cd</span> ~/Development/LUF
+  <span class='o'>(</span>master<span class='o'>)</span> Development <span class='nv'>$ </span>ls
+  src/
+  <span class='o'>(</span>master<span class='o'>)</span> Development <span class='nv'>$ </span><span class='nb'>cd </span>src; ls
+  AAR/ MSEL/ SigEvServer/ WebServices/
+  <span class='o'>(</span>master<span class='o'>)</span> src <span class='err'>$</span>
+</code></pre>
+</div>
+<p>All the apps in the src folder were Rails app (except AAR) and I wanted to move each Rails app to its own repository and then include those repositories as submodules with in the src folder.</p>
+
+<h2 id='step_1_clone_new_repositories'>Step 1. Clone new repositories.</h2>
+
+<p>You will need a new repository for each one that you are moving. Since we want to keep the history of each subfolder we need to clone the repo as follows.</p>
+<div class='highlight'><pre><code class='bash'>  
+  ~ <span class='nv'>$ </span><span class='nb'>cd </span>Development
+  Development <span class='nv'>$ </span>git clone --no-hardlinks LUF MSEL
+  Development <span class='nv'>$ </span>git clone --no-hardlinks LUF SigEvServer
+  Development <span class='nv'>$ </span>git clone --no-hardlinks LUF WebServices
+</code></pre>
+</div>
+<h2 id='step_2_filter_out_the_files_you_want_to_keep_and_remove_the_others'>Step 2. Filter out the files you want to keep and remove the others.</h2>
+
+<p>Now we will move all the files we want to keep up to the top level folder. Reset the head and then prune out all the other files. We will also remove the origin too since they will no longer be compatible.</p>
+<div class='highlight'><pre><code class='bash'>  ~ <span class='nv'>$ </span><span class='nb'>cd </span>Development/MSEL
+  <span class='o'>(</span>master<span class='o'>)</span> MSEL <span class='nv'>$ </span>git filter-branch --subdirectory-filter src/MSEL HEAD -- --all
+  <span class='o'>(</span>master<span class='o'>)</span> MSEL <span class='nv'>$ </span>git reset --hard
+  <span class='o'>(</span>master<span class='o'>)</span> MSEL <span class='nv'>$ </span>git gc --aggressive
+  <span class='o'>(</span>master<span class='o'>)</span> MSEL <span class='nv'>$ </span>git prune
+  <span class='o'>(</span>master<span class='o'>)</span> MSEL <span class='nv'>$ </span>git remote rm origin
+</code></pre>
+</div>
+<p>Repeat the process for SigEvServer and WebServices</p>
+
+<h2 id='setp_3_push_the_new_repositories_to_the_upstream_server'>Setp 3. Push the new repositories to the upstream server.</h2>
+
+<p>Now that you have local copies of all the repositories that you wanted you need to push them to the upstream server so everyone can use them.</p>
+<div class='highlight'><pre><code class='bash'>  ~ <span class='nv'>$ </span><span class='nb'>cd </span>Development/MSEL
+  <span class='o'>(</span>master<span class='o'>)</span> MSEL <span class='nv'>$ </span>git remote add git@github.com:wmernagh/MSEL.git
+</code></pre>
+</div>
+<p>Repeat the process for SigEvServer and WebServices</p>
+
+<h2 id='step_4_add_the_new_repository_as_submodules_to_the_original_repository'>Step 4. Add the new repository as submodules to the original repository</h2>
+
+<p>The final step is to remove the folders from the initial repository and add in the missing folders as submodules.</p>
+<div class='highlight'><pre><code class='bash'>  ~ <span class='nv'>$ </span><span class='nb'>cd </span>Development/LUF
+  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git rm src/MSEL src/SigEvServer src/WebServices
+  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git commit -m <span class='s2'>&quot;Removing the folders that are now repositories&quot;</span>
+
+  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git submodule add git@github.com:wmernagh/MSEL.git src/MSEL
+  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git submodule add git@github.com:wmernagh/SigEvServer.git src/SigEvServer
+  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git submodule add git@github.com:wmernagh/WebServices.git src/WebServices
+
+  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git submodule init
+  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git submoduel update
+  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git add .gitmodules src
+  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git commit -m <span class='s2'>&quot;Added in submodules for removed folders&quot;</span>
+</code></pre>
+</div>
+<p>That&#8217;s it.</p>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2011/01/convert-folder-into-git-submodule';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

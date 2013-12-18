@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>My Backup Strategy</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2011/03/backup-strategy">My Backup Strategy</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on March 28, 2011
+</div>
+  <p>Unfortunately there is no backup silver bullet, so to ensure that I have the computers in my home backuped and secured I use a mix of services. In the following sections I will describe how I use Time Machine, <a href='http://www.haystacksoftware.com/arq/'>Arq</a> and GitHub to keep my data backed up and secure.</p>
+
+<h3 id='time_machine_and_drobo'>Time Machine and <a href='http://www.drobo.com/products_time_machine.aspx'>Drobo</a></h3>
+
+<p>I use Time Machine to fully backup 3 MacBooks and a MacMini to a <a href='http://www.drobo.com/products_time_machine.aspx'>Drobo</a> that is attached to the MacMini.</p>
+
+<blockquote>
+<p>&#8220;The longer Time Machine is used, the more</p>
+</blockquote>
+
+<p>data storage it requires. Unlike other protected storage arrays, <a href='http://www.drobo.com/products_time_machine.aspx'>Drobo</a> uses patent-pending BeyondRAID software that is designed for non-technical users who demand both reliability and instant expandability without the complexity of traditional RAID.&#8221; - <a href='http://www.drobo.com/products_time_machine.aspx'><a href='http://www.drobo.com/products_time_machine.aspx'>Drobo</a> Site</a></p>
+
+<p>The <a href='http://www.drobo.com/products_time_machine.aspx'>Drobo</a> provides the ability to &#8220;Hot Swap&#8221; drives if they fail or if space is running out.</p>
+
+<p>If a hard drive fails in any of my computers I can restore from Time Machine in a couple of hours.</p>
+
+<p>The Time Machine solution makes it easy to do full backups and is trivial to setup.</p>
+
+<h3 id='arq'><a href='http://www.haystacksoftware.com/arq/'>Arq</a></h3>
+
+<p>Thanks to the reliability of <a href='http://www.drobo.com/products_time_machine.aspx'>Drobo</a>, and the daily incremental backups to it via TimeMachine, the only way to have data loss is if the computers and <a href='http://www.drobo.com/products_time_machine.aspx'>Drobo</a> are stolen or somehow destroyed (e.g. by fire). So for a subset of data that I deem most critical, and that would not be recoverable if I lost both my computers and <a href='http://www.drobo.com/products_time_machine.aspx'>Drobo</a>, I use <a href='http://www.haystacksoftware.com/arq/'>Arq</a>.</p>
+
+<p>I use <a href='http://www.haystacksoftware.com/arq/'>Arq</a> to back up my most critical files to <a href='http://aws.amazon.com/s3/'>Amazon S3</a>. <a href='http://aws.amazon.com/s3/'>Amazon S3</a> is a &#8220;highly scalable, reliable, secure, fast, and inexpensive infrastructure&#8221; that Amazon uses for its own applications.</p>
+
+<p><a href='http://www.haystacksoftware.com/arq/'>Arq</a> backups are complete and accurate, including all &#8220;metadata&#8221;. I do an incremental backup every night on my main computer&#8217;s home direcotry (with a few exceptions - see the final section). My current backup size is 66GB and I transfer about 400MB-700MB per night. This works out at a monthly cost of less than $4.</p>
+
+<p>The speed of transfer to <a href='http://aws.amazon.com/s3/'>S3</a> is amazing. It is almost as fast as the backup to Time Machine (and the size is usually the same). If I could afford to fully backup my computers to <a href='http://aws.amazon.com/s3/'>S3</a> I would and then maybe I could do away with Time Machine.</p>
+
+<p><a href='http://www.haystacksoftware.com/arq/'>Arq</a> also encrypts the data that is stored on <a href='http://aws.amazon.com/s3/'>S3</a>. I use a generated password to access my <a href='http://aws.amazon.com/s3/'>S3</a> account. The data is encrypted with a generated key. The <a href='http://www.haystacksoftware.com/arq/'>Arq</a> program remembers this information so I do not need to remember the keys. However since these are complicated passowrd/keys that I do not memorize I need a place to store them securly. And of course I will need access to this if I do not have my computers or <a href='http://www.drobo.com/products_time_machine.aspx'>Drobo</a>. For this I use <a href='http://agilewebsolutions.com/products/1Password'>1Password</a> and <a href='http://dropbox.com'>DropBox</a>.</p>
+
+<h3 id='1password_and_dropbox'><a href='http://agilewebsolutions.com/products/1Password'>1Password</a> and DropBox</h3>
+
+<p><a href='http://agilewebsolutions.com/products/1Password'>1Password</a> is a password management tool that stores all my passwords. I just have to remember one password to unlock the app and I can retrieve any of my passwords. It also has built in browser support so you can easily sign into websites or enter credit card information online.</p>
+
+<p>One of its best features is that you can store the encrypted password file in a shared folder and access it from multiple computers. This way all your computers have all your latest passwords.</p>
+
+<p>Since I often have my laptop offline or not on my home network I alwas want a local copy of this password file. To do this I use <a href='http://dropbox.com'>DropBox</a>.</p>
+
+<p>DropBox allows you to replicate a folder on your computer to their cloud. With this I replicate the folder across all my computers and it manages keeping them in sync. <a href='http://agilewebsolutions.com/products/1Password'>1Password</a> also ensures that if you were accessing the password file from multiple computers at once that the data is not corrupted.</p>
+
+<p>One nice addition to using <a href='http://agilewebsolutions.com/products/1Password'>1Password</a> and DropBox is that there that <a href='http://agilewebsolutions.com/products/1Password'>1Password</a> has an iPhone app that has support for connecting to DropBox also. So now I also have all my passwords on my iPhone too.</p>
+
+<h3 id='excluded_from_backup_to_amazon_s3_simple_storage_service'>Excluded from Backup to <a href='http://aws.amazon.com/s3/'>Amazon S3 (&#8220;Simple Storage Service&#8221;)</a></h3>
+
+<p>I keep all my <a href='http://github.com'>Github</a> repositories in my ~/Development directory and always try to keep my work pushed to <a href='http://github.com'>Github</a>. If I have work in progress changes I usually push them to a branch off of master. Because of this I do not backup my ~/Development directory to <span>Amazon S3</span>](http://aws.amazon.com/s3/) since it is redundant. The size of some of my repositories is large too so this is a good thing.</p>
+
+<p>Similarly I have my music replicated over a few computers, ipods, etc. So I do not back this up either to <a href='http://aws.amazon.com/s3/'>Amazon S3</a>.</p>
+
+<p>I also have a <a href='http://flickr.com'>Flickr</a> Pro account that I store all my photos on so I do not backup my Pictures folder to <a href='http://aws.amazon.com/s3/'>Amazon S3</a> either.</p>
+
+<p>There are a number of other folders I exclude that are application related since I can always reinstall the applications (e.g. Library/Caches, Library/Logs, Dropbox, Downloads).</p>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2011/03/backup-strategy';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

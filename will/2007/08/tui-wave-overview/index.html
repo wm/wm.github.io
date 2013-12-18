@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>TUI Wave Overview</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/08/tui-wave-overview">TUI Wave Overview</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on August  6, 2007
+</div>
+  <p>So we have been working hard on our project over the past few weeks. It is pretty much working to our expectations now and so I though it maybe time for a review of the project as a whole.</p>
+<p><strong>Our Motivation</strong><br />
+We wanted to teach some concepts of waves to users by having them create a wave and then listen to how it sounds. We also wanted the user to be able manipulate the created wave and observe the changes to the output. The main concepts we wanted to express were <em>amplitude</em> and <em>frequency</em>. So as the user varies either <em>amplitude</em> or <em>frequency</em> the sound will also change.</p>
+<p><strong>Alternative Designs</strong><br />
+Once we had decided on this project we discussed a number of alternative designs. From the beginning we decided that we were going to have both tangible input and output.</p>
+<p>For the output we were going to use sound and vision. The sound would be that of the current wave and the vision was going to be implemented with a spinner that turned proportionate to the frequency and a light that got brighter as amplitude increased.</p>
+<p>For the input we were going to have a manipulatable object that a user could create a wave from. <br />
+<li><br />
+One of our first ideas was to use something like a bicycle chain and have the user shape it to create a certain wave. We went against this because the user could create a wave that went backward in time. So we needed a different approach to apply this constraint of time to a wave. </li><br />
+<li><br />
+Another idea was to use a surface that was similar to that of the game battleship. Here the surface would be covered with many holes and the user could place pegs that represent the path of the wave. This was decided against because it gave a discrete representation of the wave and did not provide a nice way of increasing the frequency or amplitude.</ul><br />
+<li><br />
+Our final idea was to use a number of pins and sliders. Here the pins would be able to slide up and down the slider thus specifying the amplitude of a points on the wave. The sliders would be able to move left to right to change the frequency. </li><br />
+<img src="/TUI/CIMG0733.JPG" alt="low fidelity prototype" width="700" /></p>
+<p><strong>Current Design Rational and Challenges Faced Getting There</strong><br />
+Taking our final idea we developed it a bit more and decided to use a diamond structure to hold the sliders in place. This was decided upon to allow the user to change the frequency by moving the diamond hinges closer/further to/from each other.<br />
+<img src="http://tui.nfshost.com/files/tui_prototype_open.jpg" alt="low fidelity prototype" /><img src="http://tui.nfshost.com/files/tui_prototype_closed.jpg" alt="low fidelity prototype" /><br />
+This gave rise to a problem where by the amplitude of the pin on the slider would increase/decrease when changing the frequency due to the mechanics (parts of the diamond rise pulling the sliders up as the hinges get closer together). <br />
+So we then had the idea of using one diamond per slider. Having the diamonds connected together at the hinges and having the sliders attached to the hinges. This did overcome the amplitude problem but our system was getting more cumbersome and unwieldy.</p>
+<p>We decided to use <em>Computer Vision</em> to capture the location of the pins on the surface allowing us to create a wave the technology we are using is <em>top codes</em>. We introduced the idea of projecting the wave form onto the surface connecting the pins in order to give a continuos wave. Thus to the user the projected wave acts like the input to the system.</p>
+<p><embed src="/TUI/flvplayer.swf" bgcolor="#ffffff" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="file=/TUI/playlist.xml&amp;autostart=true&amp;usefullscreen=true" height="400" width="600"></embed></p>
+<p>Once we implemented the <em>top codes</em> and the projection we were able to get a better feel for the interface. We felt like we did not need the cumbersome diamond structure and that we could just use 4 pins to represent points on the wave. We could easily move the sliders left and right independently and they did not need to move in proportion to one another.<br />
+<img src="/TUI/CIMG0743.JPG" alt="working prototype in early stages" width="700"/><br />
+We also decided to create a library of sounds corresponding to 4 types of waves at different frequencies (Sine, Square, Triangle and Saw). As the user creates and manipulates the wave we loop the sound file that is closest to the wave at the closet frequency to what the user has created.</p>
+<p>This current design allows the system to give visual feedback of the wave in real-time making the projected wave seem like input for the user. The removal of the diamond formation and simplifying of the interface gives the user a more intuitive feel of how to interact with the system. Having the library as opposed to changing the sound as the wave changes allows the user to notice the changes. If we gradually changes the sound the user may not notice it. Now we change the frequency of the sound playing when certain thresholds are crossed. This also reduces the load on the system and allows for faster process of the vision side.</p>
+<p>Earlier we had issues with performance due to sound. We updated the sound on every read of the top codes and this backed up our system and it no longer operated in real-time. Now that we only update the system when the form of the wave passes a certain threshold the system can run in real-time.</p>
+<p><strong>Design Methodologies</strong><br />
+In our design we used a number of different methodologies. Sketches, low fidelity prototypes and <a href="http://tuiwave.blogspot.com/2007/07/storyboard.html">storyboards</a>. This helped visualize the system and get a feel for its interaction.</p>
+<p>Here are some of Russ&#8217; sketches and ideas.<br />
+<a href="/TUI/rus/tangible1.jpg"><img src="/TUI/rus/thumbs/tangible1.jpg" alt="" /><br />
+</a><a href="/TUI/rus/tangible2.jpg"><img src="/TUI/rus/thumbs/tangible2.jpg" alt="" /></a><a href="/TUI/rus/tangible3.jpg"><img src="/TUI/rus/thumbs/tangible3.jpg" alt="" /></a><a href="/TUI/rus/tangible4.jpg"><img src="/TUI/rus/thumbs/tangible4.jpg" alt="" /></a><a href="/TUI/rus/tangible5.jpg"><img src="/TUI/rus/thumbs/tangible5.jpg" alt="" /></a><a href="/TUI/rus/tangible6.jpg"><img src="/TUI/rus/thumbs/tangible6.jpg" alt="" /></a><a href="/TUI/rus/tangible7.jpg"><img src="/TUI/rus/thumbs/tangible7.jpg" alt="" /></a></p>
+<p>Here are the <a href="/index.php/2007/07/24/47/">Dialog and Task Diagrams</a> and the <a href="/index.php/2007/07/24/46/"><span class="caps">TAC</span> Palette</a> of the original design</p>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/08/tui-wave-overview';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

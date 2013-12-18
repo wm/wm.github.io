@@ -1,0 +1,883 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Scavenger </title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/01/scavenger">Scavenger </a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on January 25, 2007
+</div>
+  <p>For this assignment we had to write a prog in c to read in a trace file of network communications (in hex) and print out what was happening (<span class="caps">SYN</span>/<span class="caps">ACK</span> etc.). We also had to print the payload if there was any.</p>
+<p><a href="/cs/pa1.pdf" title="PA1: Scavenger">PA1: Scavenger</a> assignment description<br />
+<a href="/cs/trace1-updated.txt" title="Trace File">Trace File</a> sample trace<br />
+<a href="/cs/trace2-updated.txt" title="Trace File2">Trace File2</a> sample trace<br />
+<a href="/cs/sample_output.txt" title="Sample Output">Sample Output</a> example of expected output</p>
+<p><a href="/cs/pa11.c" title="pa1.c"> pa1.c</a> my solution</p>
+<div class="highlight"><pre><code class="c"><span class="cm">/**</span>
+<span class="cm"> * scavenger.c</span>
+<span class="cm"> *</span>
+<span class="cm"> * @author    Will Mernagh</span>
+<span class="cm"> * @version    PA1</span>
+<span class="cm"> * @course    COMP 150-ICS</span>
+<span class="cm"> * @date    Feb 08 2007</span>
+<span class="cm"> */</span>
+<span class="cp">#include &lt;netinet/ip.h&gt;</span>
+<span class="cp">#include &lt;netinet/tcp.h&gt;</span>
+<span class="cp">#include &lt;stdio.h&gt;</span>
+<span class="cp">#include &lt;stdlib.h&gt;</span>
+<span class="cp">#include &lt;arpa/inet.h&gt; </span><span class="cm">/* Need this for inet_ntoa to work properly */</span><span class="cp"></span>
+<span class="cp">#include &lt;string.h&gt; </span><span class="cm">/* Need this for strchr to work */</span><span class="cp"></span>
+<span class="cp">#include &lt;getopt.h&gt;</span>
+
+<span class="cp">/* ERROR CODES */</span>
+<span class="cp">#define NO_FILE_SPECIFIED -1</span>
+<span class="cp">#define NO_DATAGRAMS_FOUND -2</span>
+<span class="cp">#define INVALID_IP_FORMATION -3</span>
+<span class="cp">#define INVALID_TCP_FORMATION -4</span>
+<span class="cp">#define VALID_PACKET_FORMATION 0</span>
+<span class="cp">#define INVALID_HEX_DIGIT -5</span>
+<span class="cp">#define VALID_HEX_DIGIT 0</span>
+<span class="cp">#define INVALID_PAYLOAD_LENGTH -6</span>
+<span class="cp">/* End of ERROR CODES */</span>
+
+<span class="cp">/* Options */</span>
+<span class="cp">#define RAW_OFF 0</span>
+<span class="cp">#define RAW_ON 1</span>
+<span class="cp">#define DEBUG_OFF 0</span>
+<span class="cp">#define DEBUG_ON 1</span>
+<span class="cp">#define ERRORS_OFF 0</span>
+<span class="cp">#define ERRORS_ON 1</span>
+<span class="cp">#define DG_BY_DG_ON 1 </span><span class="cm">/*Datagram by packet*/</span><span class="cp"></span>
+<span class="cp">#define DG_BY_DG_OFF 0</span>
+<span class="cp">/* End Options */</span>
+
+<span class="cp">#define RESTRICTED_PORTS 1026</span>
+<span class="cp">#define PACKET_LENGTH 1026</span>
+<span class="cp">#define TRUE  1</span>
+<span class="cp">#define FALSE 0</span>
+
+<span class="k">static</span> <span class="kt">int</span> <span class="n">pause_flag</span><span class="p">;</span>
+<span class="k">static</span> <span class="kt">int</span> <span class="n">debug_flag</span><span class="p">;</span>
+<span class="k">static</span> <span class="kt">int</span> <span class="n">errors_flag</span><span class="p">;</span>
+<span class="k">static</span> <span class="kt">int</span> <span class="n">raw_flag</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">collection</span> <span class="n">COLLECTION</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">collection</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">dg_index</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">valid</span><span class="p">;</span> 
+    <span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">**</span><span class="n">packets</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="cm">/* Function declerations */</span>
+<span class="k">struct</span> <span class="n">collection</span> <span class="n">parse_file</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">**</span><span class="p">);</span>
+<span class="kt">void</span> <span class="n">print_info</span><span class="p">();</span>
+<span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">**</span> <span class="n">memory_alloc</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">**</span> <span class="n">packets</span><span class="p">,</span> <span class="kt">int</span> <span class="n">d_index</span><span class="p">);</span>
+<span class="kt">void</span> <span class="n">print_dg_info</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span><span class="p">);</span> 
+<span class="kt">char</span> <span class="o">*</span> <span class="n">string_ip_flags</span><span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="p">);</span> 
+<span class="kt">char</span> <span class="o">*</span> <span class="n">string_tcp_flags</span><span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="p">);</span> 
+<span class="kt">void</span>  <span class="n">print_ip_header</span><span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">void</span>  <span class="n">print_tcp_header</span><span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">void</span>  <span class="n">print_payload</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">void</span> <span class="n">print_usage</span><span class="p">();</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">read_options</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="p">);</span>
+<span class="kt">int</span> <span class="n">validate_is_hex</span> <span class="p">(</span> <span class="kt">char</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">int</span> <span class="n">validate_packet</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">void</span> <span class="n">debug_fun</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span><span class="p">);</span>
+<span class="cm">/* End of function declerations */</span>
+
+
+<span class="cm">/**</span>
+<span class="cm"> * Reads a file of packets (possibly ip/tcp) into an array. It</span>
+<span class="cm"> * then displays the data in a meiningfull way </span>
+<span class="cm"> *</span>
+<span class="cm"> * It can also take in a number of options including -debug</span>
+<span class="cm"> * </span>
+<span class="cm"> * @param    argc    the number of command line arguments including the program</span>
+<span class="cm"> * @param    argv    a pointer to an array of strings holding the command line </span>
+<span class="cm"> *</span>
+<span class="cm"> * @return        an int defining its success, failure.</span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[]){</span>
+
+    <span class="kt">char</span> <span class="o">*</span><span class="n">file_in</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">packet_count</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">**</span><span class="n">packets</span><span class="p">;</span>
+    <span class="n">COLLECTION</span> <span class="n">dg_col</span><span class="p">;</span>
+
+    <span class="cm">/* reads the file name and command line options if given */</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">file_in</span> <span class="o">=</span> <span class="n">read_options</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">))</span><span class="o">==</span><span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">print_usage</span><span class="p">();</span>
+        <span class="k">return</span> <span class="n">NO_FILE_SPECIFIED</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">dg_col</span> <span class="o">=</span> <span class="n">parse_file</span><span class="p">(</span><span class="n">file_in</span><span class="p">,</span> <span class="n">packets</span><span class="p">);</span>
+
+    <span class="cm">/* Count is greater than an array index by one */</span>
+    <span class="n">packet_count</span> <span class="o">=</span> <span class="n">dg_col</span><span class="p">.</span><span class="n">dg_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">packet_count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
+
+        <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">packet_count</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+    
+            <span class="c1">//debug_fun(dg_col.packets[i]);</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">dg_col</span><span class="p">.</span><span class="n">valid</span><span class="p">){</span><span class="n">print_info</span><span class="p">(</span><span class="n">dg_col</span><span class="p">.</span><span class="n">packets</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">);}</span>
+
+            <span class="cm">/* Free memory assigned to packets */</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">dg_col</span><span class="p">.</span><span class="n">packets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span><span class="n">free</span><span class="p">(</span><span class="n">dg_col</span><span class="p">.</span><span class="n">packets</span><span class="p">[</span><span class="n">i</span><span class="p">]);}</span>
+        <span class="p">}</span>
+        <span class="cm">/* Free memory assigned to packets */</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">dg_col</span><span class="p">.</span><span class="n">packets</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span><span class="n">free</span><span class="p">(</span><span class="n">dg_col</span><span class="p">.</span><span class="n">packets</span><span class="p">);}</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="k">return</span> <span class="n">NO_DATAGRAMS_FOUND</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Parses &lt;filename&gt; into an array of packets.  It expects each line to be </span>
+<span class="cm"> * numbered. It then reads the line number and white space and ignores them. </span>
+<span class="cm"> * The length of the number + whitespace is determined by the offset.</span>
+<span class="cm"> * </span>
+<span class="cm"> * @param    filename    the file to parse</span>
+<span class="cm"> * @param    packets    array holding packets</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return            the packets from the file, their count and</span>
+<span class="cm"> *                whether the packet is valid</span>
+<span class="cm"> */</span>
+<span class="n">COLLECTION</span> <span class="n">parse_file</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">filename</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">**</span><span class="n">packets</span><span class="p">){</span>
+
+    <span class="kt">char</span> <span class="n">b1</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">b2</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="o">*</span><span class="n">c</span><span class="p">;</span> <span class="c1">//stores chars read in</span>
+    <span class="kt">int</span> <span class="n">hex_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//The number of hex value groups in a line</span>
+    <span class="kt">int</span> <span class="n">d_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="c1">//The number of packets</span>
+    <span class="kt">int</span> <span class="n">offset</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="n">COLLECTION</span> <span class="n">dg_col</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">part_of_packet</span><span class="p">;</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">b1</span><span class="p">;</span>
+
+    <span class="kt">FILE</span> <span class="o">*</span><span class="n">file</span><span class="p">;</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">file</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: fopen(%s, r)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">);</span>
+
+    <span class="p">}</span><span class="k">else</span> <span class="p">{</span>
+
+        <span class="cm">/* We need to read the line number and ignore it */</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">fgets</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">){</span>
+            <span class="cm">/* Allocate memory for a pointer to a 2D array */</span>
+            <span class="n">packets</span> <span class="o">=</span> <span class="n">memory_alloc</span><span class="p">(</span><span class="n">packets</span><span class="p">,</span> <span class="n">d_index</span><span class="p">);</span>
+
+            <span class="cm">/* Datagram index incements for each line read */</span>
+            <span class="n">d_index</span><span class="o">++</span><span class="p">;</span> 
+
+            <span class="cm">/* Now we read 5 characters at a time from the file</span>
+<span class="cm">            (Until we reach either end of file or end of line. </span>
+<span class="cm">            End of line is handled by a break later)</span>
+<span class="cm">            this includes the 4 hex values and the white space */</span>
+            <span class="k">while</span><span class="p">(</span><span class="n">fgets</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+
+                <span class="cm">/* If there is a \n then this is last read on current packet*/</span>
+                <span class="k">if</span><span class="p">((</span><span class="n">strchr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="sc">&#39;\n&#39;</span><span class="p">)</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)){</span>
+
+                    <span class="cm">/* If less than 2 then no hex just end of line */</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">){</span>
+                        <span class="n">hex_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                        <span class="k">break</span><span class="p">;</span>
+                    <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">5</span><span class="p">){</span><span class="cm">/* hex and \n */</span>
+
+                        <span class="cm">/* we need to just have hex values */</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b1</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b1</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                        <span class="n">c</span> <span class="o">=</span> <span class="n">b2</span><span class="p">;</span>
+                    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+                        <span class="cm">/* we need to just have hex values */</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b1</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b1</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">b1</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">b1</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                        <span class="n">b2</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                        <span class="n">c</span> <span class="o">=</span> <span class="n">b2</span><span class="p">;</span>
+                
+                    <span class="p">}</span>
+                <span class="p">}</span>
+
+                <span class="cm">/* Check if data parsed is a hex value and return if it</span>
+<span class="cm">                 is not */</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">validate_is_hex</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="n">INVALID_HEX_DIGIT</span><span class="p">){</span>
+                    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: Invalid data in file</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+                    <span class="n">dg_col</span><span class="p">.</span><span class="n">dg_index</span> <span class="o">=</span> <span class="n">d_index</span><span class="p">;</span>
+                    <span class="n">dg_col</span><span class="p">.</span><span class="n">packets</span> <span class="o">=</span> <span class="n">packets</span><span class="p">;</span>
+                    <span class="n">dg_col</span><span class="p">.</span><span class="n">valid</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+                    <span class="k">return</span> <span class="n">dg_col</span><span class="p">;</span>
+                <span class="p">}</span>
+
+                <span class="cm">/* Read the hex value from the c string and</span>
+<span class="cm">                place it in the array */</span>
+                <span class="n">sscanf</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;%x&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">part_of_packet</span><span class="p">);</span>
+        
+                <span class="cm">/* Convert the packet into network readable format */</span>  
+                <span class="n">packets</span><span class="p">[</span><span class="n">d_index</span><span class="p">][</span><span class="n">hex_count</span><span class="p">]</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">part_of_packet</span><span class="p">);</span>  
+
+                <span class="n">hex_count</span><span class="o">++</span><span class="p">;</span>
+
+                <span class="cm">/* Ensures we do not overwrite the buffer */</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">hex_count</span> <span class="o">&gt;</span> <span class="n">PACKET_LENGTH</span><span class="p">){</span>
+                    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: Packet length too large. &quot;</span><span class="p">);</span>
+                    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Can only read in %d hex &quot;</span><span class="p">,</span> <span class="n">PACKET_LENGTH</span><span class="p">);</span>
+                    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;values per packet</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+                    <span class="n">dg_col</span><span class="p">.</span><span class="n">dg_index</span> <span class="o">=</span> <span class="n">d_index</span><span class="p">;</span>
+                    <span class="n">dg_col</span><span class="p">.</span><span class="n">valid</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+                    <span class="n">dg_col</span><span class="p">.</span><span class="n">packets</span> <span class="o">=</span> <span class="n">packets</span><span class="p">;</span>
+                    <span class="k">return</span> <span class="n">dg_col</span><span class="p">;</span>
+                <span class="p">}</span>
+    
+                <span class="cm">/* then a \n was found and this indicates end of packet */</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="n">b2</span><span class="p">){</span>
+                    <span class="n">hex_count</span> <span class="o">=</span><span class="mi">0</span><span class="p">;</span> 
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">b1</span><span class="p">;</span>
+                    <span class="k">break</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+    
+            <span class="cm">/* We need to ignore the line numbers. These numbers can take up more</span>
+<span class="cm">            than one character depending on their value, hence the offset changes </span>
+<span class="cm">            every *10 */</span>
+            <span class="k">if</span><span class="p">((</span><span class="n">d_index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">order</span><span class="p">){</span>
+                <span class="n">order</span> <span class="o">=</span> <span class="n">order</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> 
+            <span class="p">}</span>
+    
+        <span class="p">}</span>
+
+        <span class="n">fclose</span><span class="p">(</span><span class="n">file</span><span class="p">);</span>
+        <span class="n">dg_col</span><span class="p">.</span><span class="n">packets</span> <span class="o">=</span> <span class="n">packets</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">dg_col</span><span class="p">.</span><span class="n">dg_index</span> <span class="o">=</span> <span class="n">d_index</span><span class="p">;</span>
+    <span class="n">dg_col</span><span class="p">.</span><span class="n">valid</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">dg_col</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Prints all the relevant information</span>
+<span class="cm"> * </span>
+<span class="cm"> * @param    packets        array holding packets</span>
+<span class="cm"> * @param    dg_number    The index number of the packets (Index starts at 1)</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">print_info</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span><span class="n">packet</span><span class="p">,</span> <span class="kt">int</span> <span class="n">dg_number</span><span class="p">){</span>
+
+    <span class="kt">int</span> <span class="n">j</span><span class="p">,</span> <span class="n">size</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">a</span><span class="p">;</span> <span class="c1">//used for pausing after print to screen</span>
+
+    <span class="cm">/* Point the IP header to the start of the packet */</span>
+    <span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="n">ip_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="p">)</span> <span class="n">packet</span><span class="p">;</span> 
+    <span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="n">tcp_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="n">packet</span> <span class="o">+</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span> <span class="o">*</span> <span class="mi">2</span><span class="p">));</span>
+
+    <span class="cm">/* Print out relevant information */</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">validate_packet</span><span class="p">(</span><span class="n">packet</span><span class="p">)</span> <span class="o">==</span> <span class="n">VALID_PACKET_FORMATION</span><span class="p">){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Packet Number %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">dg_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="n">print_dg_info</span><span class="p">(</span><span class="n">packet</span><span class="p">);</span>
+        <span class="n">print_ip_header</span><span class="p">(</span><span class="n">ip_hdr</span><span class="p">);</span>
+        <span class="n">print_tcp_header</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">debug_flag</span> <span class="o">==</span> <span class="n">DEBUG_ON</span><span class="p">){</span><span class="n">print_payload</span><span class="p">(</span><span class="n">packet</span><span class="p">);}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span> 
+
+        <span class="cm">/* prints packet as it is in the file if raw_flag is set */</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">raw_flag</span><span class="p">){</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_len</span><span class="p">)</span><span class="o">%</span><span class="mi">2</span><span class="p">){</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_len</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_len</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="k">for</span><span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">size</span> <span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">){</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%04x &quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">packet</span><span class="p">[</span><span class="n">j</span><span class="p">]));</span> 
+            <span class="p">}</span>
+        <span class="p">}</span> 
+
+        <span class="cm">/* this puts a pause after each displayed packet */</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">pause_flag</span><span class="p">)</span> <span class="p">{</span><span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%c&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">);}</span>
+
+    <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">errors_flag</span><span class="p">){</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: In packet number %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">dg_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Prints info about the packet. Its source and destination types and what type of </span>
+<span class="cm"> * packet it is.</span>
+<span class="cm"> * </span>
+<span class="cm"> * @param    packet    a pointer to an ip and tcp struct</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">print_dg_info</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span><span class="n">packet</span><span class="p">){</span>
+
+    <span class="kt">char</span> <span class="o">*</span><span class="n">output</span><span class="p">,</span> <span class="o">*</span><span class="n">dest</span><span class="p">,</span> <span class="o">*</span><span class="n">source</span><span class="p">;</span>
+
+    <span class="cm">/* Point the IP header to the start of the packet */</span>
+    <span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="n">ip_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="p">)</span> <span class="n">packet</span><span class="p">;</span> 
+
+    <span class="cm">/* Point the TCP header to the start of the packet */</span>
+    <span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="n">tcp_h</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="n">packet</span> <span class="o">+</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span> <span class="o">*</span> <span class="mi">2</span><span class="p">));</span>
+
+<span class="cp">#ifdef DARWIN</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">th_sport</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">RESTRICTED_PORTS</span><span class="p">){</span>
+<span class="cp">#else </span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">source</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">RESTRICTED_PORTS</span><span class="p">){</span>
+<span class="cp">#endif</span>
+        <span class="n">source</span> <span class="o">=</span>  <span class="s">&quot;Client -&gt; &quot;</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="n">source</span> <span class="o">=</span>  <span class="s">&quot;Server -&gt; &quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="cp">#ifdef DARWIN</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">th_dport</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">RESTRICTED_PORTS</span><span class="p">){</span>
+<span class="cp">#else </span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">dest</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">RESTRICTED_PORTS</span><span class="p">){</span>
+<span class="cp">#endif</span>
+        <span class="n">dest</span> <span class="o">=</span>  <span class="s">&quot;Client&quot;</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="n">dest</span> <span class="o">=</span>  <span class="s">&quot;Server&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">output</span> <span class="o">=</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="o">+</span> <span class="n">strlen</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="n">output</span> <span class="o">=</span>  <span class="n">strcat</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
+    <span class="n">output</span> <span class="o">=</span>  <span class="n">strcat</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dest</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">output</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Type of TCP packet: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">string_tcp_flags</span><span class="p">(</span><span class="n">tcp_h</span><span class="p">));</span>
+<span class="p">}</span>
+
+
+<span class="cm">/**</span>
+<span class="cm"> * Returns a pointer to a string specifing which flag is set.</span>
+<span class="cm"> * </span>
+<span class="cm"> * @param    iph    a pointer to an ip struct</span>
+<span class="cm"> * @return        pointer to a string [RF|DF|MF|MASK|UNSET]</span>
+<span class="cm"> */</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">string_ip_flags</span><span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="n">ip_h</span><span class="p">){</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;UNSET&quot;</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">ip_h</span><span class="o">-&gt;</span><span class="n">ip_off</span><span class="p">)</span> <span class="o">==</span> <span class="n">IP_RF</span><span class="p">){</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;RF&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">ip_h</span><span class="o">-&gt;</span><span class="n">ip_off</span><span class="p">)</span> <span class="o">==</span> <span class="n">IP_DF</span><span class="p">){</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;DF&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">ip_h</span><span class="o">-&gt;</span><span class="n">ip_off</span><span class="p">)</span> <span class="o">==</span> <span class="n">IP_MF</span><span class="p">){</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;MF&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">ip_h</span><span class="o">-&gt;</span><span class="n">ip_off</span><span class="p">)</span> <span class="o">==</span> <span class="n">IP_OFFMASK</span><span class="p">){</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;MASK&quot;</span><span class="p">;}</span>
+    <span class="k">return</span> <span class="n">flag</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Returns a pointer to a string specifing which flag is set.</span>
+<span class="cm"> * </span>
+<span class="cm"> * @param    tcp_h    a pointer to an tcp struct</span>
+<span class="cm"> * @return        pointer to a string [FIN|SYN|RST|PUSH|ACK|URG|UNSET]</span>
+<span class="cm"> */</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">string_tcp_flags</span><span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="n">tcp_h</span><span class="p">){</span>
+
+    <span class="kt">char</span> <span class="o">*</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;UNSET&quot;</span><span class="p">;</span>
+
+
+<span class="cp"># ifdef DARWIN </span><span class="cm">/* attempt to have this working locally and in school */</span><span class="cp"></span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">th_flags</span><span class="p">)</span> <span class="o">==</span> <span class="n">TH_FIN</span><span class="p">){</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;FIN&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">th_flags</span><span class="p">)</span> <span class="o">==</span> <span class="n">TH_SYN</span><span class="p">){</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;SYN&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">th_flags</span><span class="p">)</span> <span class="o">==</span> <span class="n">TH_RST</span><span class="p">){</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;RST&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">th_flags</span><span class="p">)</span> <span class="o">==</span> <span class="n">TH_PUSH</span><span class="p">){</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;PUSH&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">th_flags</span><span class="p">)</span> <span class="o">==</span> <span class="n">TH_ACK</span><span class="p">){</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;ACK&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">th_flags</span><span class="p">)</span> <span class="o">==</span> <span class="n">TH_URG</span><span class="p">){</span><span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;URG&quot;</span><span class="p">;}</span>
+
+<span class="cp"># else </span><span class="cm">/* !DARWIN */</span><span class="cp"></span>
+    <span class="k">if</span><span class="p">((</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">fin</span><span class="p">)){</span> <span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;FIN&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">rst</span><span class="p">)){</span> <span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;RST&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">psh</span><span class="p">)){</span> <span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;PSH&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">ack</span><span class="p">)){</span> <span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;ACK&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">syn</span><span class="p">)){</span> <span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;SYN&quot;</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">tcp_h</span><span class="o">-&gt;</span><span class="n">urg</span><span class="p">)){</span> <span class="n">flag</span> <span class="o">=</span> <span class="s">&quot;URG&quot;</span><span class="p">;}</span>
+<span class="cp"># endif </span><span class="cm">/* DARWIN */</span><span class="cp"></span>
+    <span class="k">return</span> <span class="n">flag</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Prints the IP header information to STDOUT of a given packet</span>
+<span class="cm"> * in a human readable form.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    ip_hdr        a pointer to a ip header </span>
+<span class="cm"> *                which holds a packet in network form</span>
+<span class="cm"> *</span>
+<span class="cm"> * @see        htons, ntohs    </span>
+<span class="cm"> */</span>
+<span class="kt">void</span>  <span class="n">print_ip_header</span><span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="n">ip_hdr</span><span class="p">){</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;|(VER) %d |(HL) %d |(TOS) %2x |(LEN) %6d|</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> 
+                    <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_v</span><span class="p">,</span> 
+                    <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span><span class="p">,</span> 
+                    <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_tos</span><span class="p">,</span>
+                    <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_len</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;|(ID) %5d |(FLAGS) %5s|(OFF) %6d |</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> 
+                    <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_id</span><span class="p">,</span> 
+                    <span class="n">string_ip_flags</span><span class="p">(</span><span class="n">ip_hdr</span><span class="p">),</span> 
+                    <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_off</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;|(TTL) %5d|(PROTP) %5d|(CKSUM) %5d|</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> 
+                    <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_ttl</span><span class="p">,</span> 
+                    <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_p</span><span class="p">,</span> 
+                    <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_sum</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;|(SOURCE)</span><span class="se">\t</span><span class="s">%15s</span><span class="se">\t\t</span><span class="s">|</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">inet_ntoa</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_src</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;|(DEST)</span><span class="se">\t\t</span><span class="s">%15s</span><span class="se">\t\t</span><span class="s">|</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">inet_ntoa</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_dst</span><span class="p">));</span>
+
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Prints the TCP header information to STDOUT of a given packet</span>
+<span class="cm"> * in a human readable form. It also attempts to work on mac OS X </span>
+<span class="cm"> * linux using the c preprocessor.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    tcp_hdr        a pointer to a tcp header struct</span>
+<span class="cm"> *                which holds a packet in network form</span>
+<span class="cm"> *</span>
+<span class="cm"> * @see        htons, ntohs    </span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">print_tcp_header</span><span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="n">tcp_hdr</span><span class="p">){</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+
+<span class="cp"># ifdef DARWIN</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;(SPORT) %5d</span><span class="se">\t</span><span class="s"> |(DPORT) %5d</span><span class="se">\t\t</span><span class="s">|</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_sport</span><span class="p">),</span> 
+           <span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_dport</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;(SEQ) %10u |(ACK) %15u |</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohl</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_seq</span><span class="p">),</span> 
+           <span class="n">ntohl</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_ack</span><span class="p">));</span>
+
+<span class="cp"># else </span><span class="cm">/* DARWIN */</span><span class="cp"></span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;(SPORT) %5d</span><span class="se">\t</span><span class="s"> |(DPORT) %5d</span><span class="se">\t\t</span><span class="s">|</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">source</span><span class="p">),</span> 
+           <span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">dest</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;(SEQ) %10u |(ACK) %15u |</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohl</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">seq</span><span class="p">),</span> 
+           <span class="n">ntohl</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">ack_seq</span><span class="p">));</span>
+
+<span class="cp"># endif </span><span class="cm">/* DARWIN */</span><span class="cp"></span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;(FLAGS) </span><span class="se">\t\t</span><span class="s">%10s</span><span class="se">\t</span><span class="s">|</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">string_tcp_flags</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;-----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Prints the payload in the packet which is located after the ip and tcp </span>
+<span class="cm"> * headers.</span>
+<span class="cm"> * </span>
+<span class="cm"> * @param    packet    a packet of ip, tcp and data</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="kt">void</span>  <span class="n">print_payload</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span><span class="n">packet</span><span class="p">){</span>
+
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="n">ip_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="p">)</span> <span class="n">packet</span><span class="p">;</span> 
+    <span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="n">tcp_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="n">packet</span> <span class="o">+</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span> <span class="o">*</span> <span class="mi">2</span><span class="p">));</span>
+<span class="cp">#ifdef DARWIN</span>
+    <span class="kt">short</span> <span class="n">data_length</span> <span class="o">=</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_len</span><span class="p">)</span> <span class="o">-</span> <span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_off</span><span class="o">*</span><span class="mi">4</span> <span class="o">-</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span><span class="o">*</span><span class="mi">4</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;data_len = %d = &quot;</span><span class="p">,</span> <span class="n">data_length</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_len) - tcp_hdr-&gt;th_off*4 - ip_hdr-&gt;ip_hl*4 = </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d - %d - %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_len</span><span class="p">),</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_off</span><span class="o">*</span><span class="mi">4</span><span class="p">,</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span><span class="o">*</span><span class="mi">4</span><span class="p">);</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">payload</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="n">packet</span> <span class="o">+</span> <span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> 
+                                <span class="o">+</span> <span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_off</span><span class="o">*</span><span class="mi">2</span><span class="p">);</span>
+<span class="cp">#else </span><span class="cm">/* DARWIN */</span><span class="cp"></span>
+    <span class="kt">short</span> <span class="n">data_length</span> <span class="o">=</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_len</span><span class="p">)</span> <span class="o">-</span> <span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">doff</span><span class="o">*</span><span class="mi">4</span> <span class="o">-</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span><span class="o">*</span><span class="mi">4</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">payload</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="n">packet</span> <span class="o">+</span> <span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> 
+                                    <span class="o">+</span> <span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">doff</span><span class="o">*</span><span class="mi">2</span><span class="p">);</span>
+<span class="cp">#endif </span><span class="cm">/* DARWIN */</span><span class="cp"></span>
+
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">data_length</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="cm">/* check if the character is printable */</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">isprint</span><span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="n">i</span><span class="p">])){</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%c&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;^&quot;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+
+<span class="cm">/**</span>
+<span class="cm"> * Prints the usage statement to STDOUT</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">print_usage</span><span class="p">(){</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">usage: scavenger [-debug | -p | -r | -e] &lt;file&gt;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;    -debug     prints the payload of the packet</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;    -r     prints out the packet in its original form</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;    -p     puts a pause after displaying each packet</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;    -e     prints all errors. Prints if a packet is invalid</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span> 
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Info: Scavenger will print information on the packets that are written&quot;</span>
+        <span class="s">&quot; to a file.</span><span class="se">\n</span><span class="s">The file needs to be formatted correctly or no information&quot;</span>
+        <span class="s">&quot; will be displayed. If</span><span class="se">\n</span><span class="s">the file is formatted correctly and the packet is a&quot;</span>
+        <span class="s">&quot; valid IP/TCP packet then the</span><span class="se">\n</span><span class="s">packet gets displayed. If there is an&quot;</span>
+        <span class="s">&quot; invalid TCP/IP packet it will be skipped.&quot;</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Returns the file that was read from the command line. It also sets the debug</span>
+<span class="cm"> * and display flags depending on the command line options.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    argc    the number of command line arguments including the program</span>
+<span class="cm"> * @param    argv    a pointer to an array of strings holding the command line </span>
+<span class="cm"> *            argumants.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return    a pointer to a file name (string)</span>
+<span class="cm"> *</span>
+<span class="cm"> * @see        getopt_long_only</span>
+<span class="cm"> */</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">read_options</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">){</span>
+    <span class="kt">int</span> <span class="n">c</span><span class="p">;</span>
+
+    <span class="k">static</span> <span class="k">struct</span> <span class="n">option</span> <span class="n">long_options</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="cm">/* These options set a flag. */</span>
+        <span class="p">{</span><span class="s">&quot;p&quot;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pause_flag</span><span class="p">,</span> <span class="n">DG_BY_DG_ON</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&quot;debug&quot;</span><span class="p">,</span>   <span class="n">no_argument</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">debug_flag</span><span class="p">,</span> <span class="n">DEBUG_ON</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&quot;e&quot;</span><span class="p">,</span>   <span class="n">no_argument</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">errors_flag</span><span class="p">,</span> <span class="n">ERRORS_ON</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&quot;r&quot;</span><span class="p">,</span>   <span class="n">no_argument</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">raw_flag</span><span class="p">,</span> <span class="n">RAW_ON</span><span class="p">},</span>
+    <span class="p">};</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/* getopt_long stores the option index here. */</span>
+        <span class="cm">/* We do not use it to access any options here though */</span>
+        <span class="kt">int</span> <span class="n">option_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="c1">//c = getopt_long (argc, argv, &quot;&quot;, long_options, &amp;option_index);</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">getopt_long_only</span> <span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">long_options</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">option_index</span><span class="p">);</span>
+
+        <span class="cm">/* Detect the end of the options. */</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">){</span> <span class="k">break</span><span class="p">;}</span>
+
+    <span class="p">}</span>
+
+    <span class="cm">/* Return the file name */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">optind</span> <span class="o">&lt;</span> <span class="n">argc</span><span class="p">)</span> <span class="p">{</span> 
+        <span class="k">return</span> <span class="n">argv</span><span class="p">[</span><span class="n">optind</span><span class="p">];</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>    
+
+<span class="cm">/**</span>
+<span class="cm"> * Checks whether each character in a string is a hex digit </span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    a    A string pointer</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return    0 if valid else INVALID_HEX_DIGIT</span>
+<span class="cm"> *</span>
+<span class="cm"> * @see        isxdigit()</span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">validate_is_hex</span> <span class="p">(</span> <span class="kt">char</span> <span class="o">*</span><span class="n">a</span> <span class="p">)</span>
+<span class="p">{</span>
+      <span class="kt">unsigned</span> <span class="n">i</span><span class="p">;</span>
+      <span class="cm">/* We are expecting 4 hex and one space,</span>
+<span class="cm">    so we need to ignore the trailing space.</span>
+<span class="cm">    for ( i = 0; i &lt; strlen ( a ) -1; i++ ){ */</span>
+      <span class="k">for</span> <span class="p">(</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">strlen</span> <span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">-</span><span class="mi">2</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span> <span class="p">){</span>
+
+            <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">isxdigit</span> <span class="p">(</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span> <span class="p">){</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">errors_flag</span><span class="p">){</span>
+                <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: %c is not a hex value</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+            <span class="p">}</span>
+             <span class="k">return</span> <span class="n">INVALID_HEX_DIGIT</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+      <span class="k">return</span> <span class="n">VALID_HEX_DIGIT</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Checks whether each ip/tcp header is formed properly</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    packet    the packet to check</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return    Either VALID_PACTET_FORMATION, INVALID_IP_FORMATION or</span>
+<span class="cm"> *         INVALID_TCP_FORMATION</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">validate_packet</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span><span class="n">packet</span><span class="p">){</span>
+
+    <span class="cm">/* Point the IP header to the start of the packet */</span>
+    <span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="n">ip_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="p">)</span> <span class="n">packet</span><span class="p">;</span> 
+    <span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="n">tcp_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="n">packet</span> <span class="o">+</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span> <span class="o">*</span> <span class="mi">2</span><span class="p">));</span>
+
+    <span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">ip_v</span> <span class="o">=</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_v</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">ip_hl</span> <span class="o">=</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">flag</span> <span class="o">=</span> <span class="n">string_ip_flags</span><span class="p">(</span><span class="n">ip_hdr</span><span class="p">);</span>
+
+<span class="cp">#ifdef DARWIN</span>
+    <span class="kt">short</span> <span class="n">data_length</span> <span class="o">=</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_len</span><span class="p">)</span> <span class="o">-</span> <span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_off</span><span class="o">*</span><span class="mi">4</span> <span class="o">-</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span><span class="o">*</span><span class="mi">4</span><span class="p">;</span>
+<span class="cp">#else </span><span class="cm">/* DARWIN */</span><span class="cp"></span>
+    <span class="kt">short</span> <span class="n">data_length</span> <span class="o">=</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_len</span><span class="p">)</span> <span class="o">-</span> <span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">doff</span><span class="o">*</span><span class="mi">4</span> <span class="o">-</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span><span class="o">*</span><span class="mi">4</span><span class="p">;</span>
+<span class="cp">#endif </span><span class="cm">/* DARWIN */</span><span class="cp"></span>
+
+    <span class="cm">/* Check that information in ip/tcp adds up */</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">data_length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">errors_flag</span><span class="p">){</span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: negative payload length</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);}</span>
+        <span class="k">return</span> <span class="n">INVALID_PAYLOAD_LENGTH</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* Check that IP is formed correctly */</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">flag</span> <span class="o">==</span> <span class="s">&quot;UNSET&quot;</span> <span class="o">||</span> <span class="p">(</span><span class="n">ip_v</span> <span class="o">!=</span> <span class="mi">4</span> <span class="o">&amp;&amp;</span> <span class="n">ip_v</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">)</span> <span class="o">||</span> <span class="n">ip_hl</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">){</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">errors_flag</span><span class="p">){</span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: invalid ip packet</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);}</span>
+        <span class="c1">//return INVALID_IP_FORMATION;</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* Check if TCP is formed correctly */</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">string_tcp_flags</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">flag</span> <span class="o">==</span> <span class="s">&quot;UNSET&quot;</span><span class="p">){</span>
+<span class="cp">#ifndef DARWIN</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">errors_flag</span><span class="p">){</span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: invalid tcp packet</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);}</span>
+        <span class="k">return</span> <span class="n">INVALID_TCP_FORMATION</span><span class="p">;</span>
+<span class="cp">#endif </span><span class="cm">/* DARWIN - cannot get flags working for mac */</span><span class="cp"></span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">VALID_PACKET_FORMATION</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Allocates memory for the packets pointer. It decides whether to malloc or realloc</span>
+<span class="cm"> * based on the d_index value.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    packets    the pointer to allocate memory for</span>
+<span class="cm"> * @param    d_index        the index of the packets array. If 0 malloc else realloc</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return    pointer to allocated memory (Pointer to 2D array)</span>
+<span class="cm"> *</span>
+<span class="cm"> * @see        malloc, realloc</span>
+<span class="cm"> */</span>
+<span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">**</span> <span class="n">memory_alloc</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">**</span> <span class="n">packets</span><span class="p">,</span> <span class="kt">int</span> <span class="n">d_index</span><span class="p">){</span>
+    
+    <span class="cm">/* Allocate memory for a pointer to a 2D array */</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">d_index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+        <span class="n">packets</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">**</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span><span class="p">));</span> 
+        <span class="k">if</span> <span class="p">(</span><span class="n">packets</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+            <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: Malloc failed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">packets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> 
+            <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">PACKET_LENGTH</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span><span class="p">));</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">packets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+            <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: Malloc failed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="cm">/* allocate more memory */</span>
+        <span class="n">packets</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">**</span><span class="p">)</span><span class="n">realloc</span><span class="p">((</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="o">**</span><span class="p">)</span><span class="n">packets</span><span class="p">,</span>
+                        <span class="p">((</span><span class="n">d_index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span><span class="p">)));</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">packets</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+            <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: Realloc failed for #%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">d_index</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="n">packets</span><span class="p">[</span><span class="n">d_index</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span>
+            <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">PACKET_LENGTH</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span><span class="p">));</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">packets</span><span class="p">[</span><span class="n">d_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+            <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Error: Realloc failed for #%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">d_index</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">packets</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">debug_fun</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="o">*</span> <span class="n">packet</span><span class="p">){</span>
+
+    <span class="cm">/* Point the IP header to the start of the packet */</span>
+    <span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="n">ip_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">ip</span> <span class="o">*</span><span class="p">)</span> <span class="n">packet</span><span class="p">;</span> 
+    <span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="n">tcp_hdr</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">tcphdr</span> <span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="n">packet</span> <span class="o">+</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span> <span class="o">*</span> <span class="mi">2</span><span class="p">));</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_len) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_len</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ip_hdr-&gt;ip_len = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_len</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_id) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_id</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ip_hdr-&gt;ip_id = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_id</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_v) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_v</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ip_hdr-&gt;ip_v = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_v</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_hl) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ip_hdr-&gt;ip_hl = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_hl</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_tos) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_tos</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ip_hdr-&gt;ip_tos = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_tos</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_off) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_off</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ip_hdr-&gt;ip_off = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_off</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_ttl) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_ttl</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ip_hdr-&gt;ip_ttl = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_ttl</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_p) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_p</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ip_hdr-&gt;ip_p = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_p</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_sum) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_sum</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ip_hdr-&gt;ip_sum = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_sum</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_sum) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_sum</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ip_hdr-&gt;ip_sum = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_sum</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(ip_hdr-&gt;ip_off) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_off</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ip_hdr-&gt;ip_off = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ip_hdr</span><span class="o">-&gt;</span><span class="n">ip_off</span><span class="p">);</span>
+<span class="cp">#ifdef DARWIN    </span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(tcp_hdr-&gt;th_dport) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_dport</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;tcp_hdr-&gt;th_dport = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_dport</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(tcp_hdr-&gt;th_sport) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_sport</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;tcp_hdr-&gt;th_sport = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_sport</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohl(tcp_hdr-&gt;th_seq) = %u</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohl</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_seq</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;tcp_hdr-&gt;th_seq = %u</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_seq</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(tcp_hdr-&gt;th_off) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_off</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;tcp_hdr-&gt;th_off = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_off</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ntohs(tcp_hdr-&gt;th_flags) = %d</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_flags</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;tcp_hdr-&gt;th_flags = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">tcp_hdr</span><span class="o">-&gt;</span><span class="n">th_flags</span><span class="p">);</span>
+<span class="cp">#endif</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;*************************************</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="cm">/*printf(&quot;ntohl(ip_hdr-&gt;ip_len) = %d\t&quot;, ntohl(ip_hdr-&gt;ip_len));</span>
+<span class="cm">    printf(&quot;ip_hdr-&gt;ip_len = %d\n&quot;, ip_hdr-&gt;ip_len);</span>
+
+<span class="cm">    printf(&quot;ntohl(ip_hdr-&gt;ip_v) = %d\t&quot;, ntohl(ip_hdr-&gt;ip_v));</span>
+<span class="cm">    printf(&quot;ip_hdr-&gt;ip_v = %d\n&quot;, ip_hdr-&gt;ip_v);</span>
+
+<span class="cm">    printf(&quot;ntohl(ip_hdr-&gt;ip_hl) = %d\t&quot;, ntohl(ip_hdr-&gt;ip_hl));</span>
+<span class="cm">    printf(&quot;ip_hdr-&gt;ip_hl = %d\n&quot;, ip_hdr-&gt;ip_hl);</span>
+
+<span class="cm">    printf(&quot;ntohl(ip_hdr-&gt;ip_tos) = %d\t&quot;, ntohl(ip_hdr-&gt;ip_tos));</span>
+<span class="cm">    printf(&quot;ip_hdr-&gt;ip_tos = %d\n&quot;, ip_hdr-&gt;ip_tos);</span>
+
+<span class="cm">    printf(&quot;ntohl(ip_hdr-&gt;ip_off) = %d\t&quot;, ntohl(ip_hdr-&gt;ip_off));</span>
+<span class="cm">    printf(&quot;ip_hdr-&gt;ip_off = %d\n&quot;, ip_hdr-&gt;ip_off);</span>
+
+<span class="cm">    printf(&quot;ntohl(ip_hdr-&gt;ip_ttl) = %d\t&quot;, ntohl(ip_hdr-&gt;ip_ttl));</span>
+<span class="cm">    printf(&quot;ip_hdr-&gt;ip_ttl = %d\n&quot;, ip_hdr-&gt;ip_ttl);</span>
+
+<span class="cm">    printf(&quot;ntohl(ip_hdr-&gt;ip_p) = %d\t&quot;, ntohl(ip_hdr-&gt;ip_p));</span>
+<span class="cm">    printf(&quot;ip_hdr-&gt;ip_p = %d\n&quot;, ip_hdr-&gt;ip_p);</span>
+
+<span class="cm">    printf(&quot;ntohl(ip_hdr-&gt;ip_sum) = %d\t&quot;, ntohl(ip_hdr-&gt;ip_sum));</span>
+<span class="cm">    printf(&quot;ip_hdr-&gt;ip_sum = %d\n&quot;, ip_hdr-&gt;ip_sum);</span>
+
+<span class="cm">    printf(&quot;ntohl(ip_hdr-&gt;ip_sum) = %d\t&quot;, ntohl(ip_hdr-&gt;ip_sum));</span>
+<span class="cm">    printf(&quot;ip_hdr-&gt;ip_sum = %d\n&quot;, ip_hdr-&gt;ip_sum);</span>
+
+<span class="cm">    printf(&quot;ntohl(ip_hdr-&gt;ip_off) = %d\t&quot;, ntohl(ip_hdr-&gt;ip_off));</span>
+<span class="cm">    printf(&quot;ip_hdr-&gt;ip_off = %d\n&quot;, ip_hdr-&gt;ip_off);</span>
+
+<span class="cm">    printf(&quot;ntohl(tcp_hdr-&gt;th_dport) = %d\t&quot;, ntohl(tcp_hdr-&gt;th_dport));</span>
+<span class="cm">    printf(&quot;tcp_hdr-&gt;th_dport = %d\n&quot;, tcp_hdr-&gt;th_dport);</span>
+
+<span class="cm">    printf(&quot;ntohl(tcp_hdr-&gt;th_sport) = %d\t&quot;, ntohl(tcp_hdr-&gt;th_sport));</span>
+<span class="cm">    printf(&quot;tcp_hdr-&gt;th_sport = %d\n&quot;, tcp_hdr-&gt;th_sport);</span>
+
+<span class="cm">    printf(&quot;ntohl(tcp_hdr-&gt;th_seq) = %d\t&quot;, ntohl(tcp_hdr-&gt;th_seq));</span>
+<span class="cm">    printf(&quot;tcp_hdr-&gt;th_seq = %d\n&quot;, tcp_hdr-&gt;th_seq);</span>
+
+<span class="cm">    printf(&quot;ntohl(tcp_hdr-&gt;th_flags) = %d\t&quot;, ntohl(tcp_hdr-&gt;th_flags));</span>
+<span class="cm">    printf(&quot;tcp_hdr-&gt;th_flags = %d\n&quot;, tcp_hdr-&gt;th_flags);*/</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/01/scavenger';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

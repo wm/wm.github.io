@@ -1,0 +1,774 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Secure, Authenticated Message Transfer</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/04/secure-authenticated-message-transfer">Secure, Authenticated Message Transfer</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on April 11, 2007
+</div>
+  <p>Basically we had to write an app that will encrypt text with a password and write it to a file. It would then have to decrypt it given the same file and password. It is to be used to send the file (binary) over an unsecure channel.</p>
+<p><a href="/cs/pa4.pdf" title="PA4">PA4 </a> the assignement</p>
+<p><a href="/cs/pa4.c" title="pa4.c">pa4.c</a> my solution</p>
+<div class="highlight"><pre><code class="c"><span class="cm">/**</span>
+<span class="cm"> * main.c</span>
+<span class="cm"> *</span>
+<span class="cm"> * @author    Will Mernagh</span>
+<span class="cm"> * @version PA4</span>
+<span class="cm"> * @course    COMP 150-ICS</span>
+<span class="cm"> * @date    Apr 11 2007</span>
+<span class="cm"> * </span>
+<span class="cm"> * @notes    1.I have changed fprintf to print to stdout not stderr so that it matches the given</span>
+<span class="cm"> *            solution. for a more natural solution change this back.</span>
+<span class="cm"> *</span>
+<span class="cm"> *            2. I have one noticable difference between this sol and given sol and that is that    </span>
+<span class="cm"> *            for a corrupted file (where i deleted a character) i print out a invalid file. given  </span>
+<span class="cm"> *            sol prints out invalid hash.</span>
+<span class="cm"> */</span>
+<span class="cp">#define _GNU_SOURCE</span>
+<span class="cp">#include &lt;stdlib.h&gt;</span>
+<span class="cp">#include &lt;stdio.h&gt;</span>
+<span class="cp">#include &lt;string.h&gt;</span>
+<span class="cp">#include &lt;fcntl.h&gt;</span>
+<span class="cp">#include &lt;time.h&gt;</span>
+<span class="cp">#include &quot;global.h&quot;</span>
+<span class="cp">#include &quot;md5.h&quot;</span>
+<span class="cp">#include &lt;unistd.h&gt;</span>
+<span class="cp">#include &lt;crypt.h&gt;</span>
+
+<span class="cm">/* Function declerations */</span>
+<span class="kt">char</span><span class="o">*</span> <span class="n">getPlaintext</span><span class="p">();</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">addToBuffer</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bufferPtr</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">addedStrPtr</span><span class="p">);</span>
+<span class="kt">int</span> <span class="n">printBufToFile</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bufferPtr</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">fileName</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">decode</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">s_out</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">s_in</span><span class="p">,</span> <span class="kt">int</span> <span class="n">bytelen</span><span class="p">)</span> <span class="p">;</span>
+<span class="kt">void</span> <span class="nf">encode</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">s_out</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">s_in</span><span class="p">,</span> <span class="kt">int</span> <span class="n">textlen</span><span class="p">)</span> <span class="p">;</span>
+<span class="kt">int</span> <span class="n">bin2byte</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">s</span><span class="p">);</span>
+<span class="kt">void</span> <span class="n">byte2bin</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">b</span><span class="p">);</span>
+<span class="kt">int</span> <span class="n">power</span><span class="p">(</span><span class="kt">int</span> <span class="n">base</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">);</span>
+<span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span> <span class="n">MDString</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">digestin</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">string</span><span class="p">);</span>
+<span class="kt">int</span> <span class="n">printToFile</span><span class="p">(</span><span class="kt">int</span> <span class="n">textlen</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">digestptr</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">txt_out</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">fileName</span><span class="p">);</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">readFromFile</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">textlen</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">digestptr</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">txt_in</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">fileName</span><span class="p">);</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">getKey</span><span class="p">(</span><span class="kt">int</span> <span class="n">min</span><span class="p">,</span> <span class="kt">int</span> <span class="n">max</span><span class="p">);</span>
+
+<span class="cp">/* definitions for MD5 */</span>
+<span class="cp">#define MD_CTX MD5_CTX</span>
+<span class="cp">#define MDInit MD5Init</span>
+<span class="cp">#define MDUpdate MD5Update</span>
+<span class="cp">#define MDFinal MD5Final</span>
+<span class="cp">#define ENCODE (0)</span>
+<span class="cp">#define DECODE (1)</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * This program encrypts/decrypts plaintext.</span>
+<span class="cm"> * The user passes -e to encrypt and -d to decrypt</span>
+<span class="cm"> * The second param must be a file</span>
+<span class="cm"> * </span>
+<span class="cm"> * @param    argc    the number of command line arguments including the program</span>
+<span class="cm"> * @param    argv    a pointer to an array of strings holding the command line </span>
+<span class="cm"> *</span>
+<span class="cm"> * @return        an int defining its success, failure.</span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="nf">main</span> <span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+
+    <span class="kt">char</span> <span class="o">*</span><span class="n">plainText</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">key_in</span><span class="p">,</span> <span class="n">key</span><span class="p">[</span><span class="mi">128</span><span class="p">];</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">encoded_text</span><span class="p">,</span> <span class="o">*</span><span class="n">txt_out</span><span class="p">,</span> <span class="o">*</span><span class="n">txt_in</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">offset</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">i</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">digest</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="o">*</span><span class="n">digestptr</span><span class="p">,</span> <span class="n">digestin</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="o">*</span><span class="n">digestinptr</span><span class="p">;</span>
+
+    <span class="n">digestptr</span> <span class="o">=</span> <span class="n">digest</span><span class="p">;</span>
+    <span class="n">digestinptr</span> <span class="o">=</span> <span class="n">digestin</span><span class="p">;</span>
+
+    <span class="cm">/* check for 2 command-line args */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">==</span> <span class="mi">3</span><span class="p">){</span>
+
+        <span class="cm">/* if the encrypt option is selected */</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="s">&quot;-e&quot;</span><span class="p">,</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">strlen</span><span class="p">(</span><span class="s">&quot;-e&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">strlen</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">){</span>
+    
+            <span class="cm">/* get the text to be encrypted */</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Enter your message now, terminate with a single&quot;</span><span class="p">);</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&#39;.&#39; on its own line.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+            <span class="n">plainText</span> <span class="o">=</span> <span class="n">getPlaintext</span><span class="p">();</span>
+    
+            <span class="cm">/* get the key to encrypt text with */</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Please enter the key: &quot;</span><span class="p">);</span>
+            <span class="n">key_in</span> <span class="o">=</span> <span class="n">getKey</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span>
+            <span class="n">encode</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">key_in</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span>
+            <span class="n">setkey</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+    
+    
+            <span class="k">if</span><span class="p">(</span><span class="n">plainText</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+    
+                <span class="cm">/* compute the md5 hash */</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Computing MD5 digest...&quot;</span><span class="p">);</span>
+                <span class="n">digestptr</span> <span class="o">=</span> <span class="n">MDString</span><span class="p">(</span><span class="n">digestptr</span><span class="p">,</span> <span class="n">plainText</span><span class="p">);</span>
+        
+        
+                <span class="cm">/* check that the md5 hash is at least 16 bytes */</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">digestptr</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">16</span><span class="p">){</span>
+        
+                    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;OK</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+            
+                <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        
+                    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;ERROR digest length</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+             
+                    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+            
+                <span class="p">}</span>
+        
+            <span class="cm">/* </span>
+<span class="cm">               encrypt() takes a 64-byte array as an argument so we need to encode </span>
+<span class="cm">               the plaintext into 64-byte arrays. We also need to be sure the last </span>
+<span class="cm">               array passed will be of length 64. For this purpose will allocate </span>
+<span class="cm">               enough memory such that the encoded_text buffer will be a multiple</span>
+<span class="cm">               of 64. We do this by adding a pad.</span>
+<span class="cm">       </span>
+<span class="cm">               Also each byte in the 64 byte array represents a bit in the messege.</span>
+<span class="cm">               Therefor we need to disassemble the plaintext into this format</span>
+<span class="cm">            */</span>
+                <span class="n">pad</span> <span class="o">=</span> <span class="mi">64</span> <span class="o">-</span> <span class="p">((</span><span class="n">strlen</span><span class="p">(</span><span class="n">plainText</span><span class="p">)</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span><span class="o">%</span><span class="mi">64</span><span class="p">);</span>
+                <span class="n">encoded_text</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">((</span><span class="mi">8</span><span class="o">*</span><span class="n">strlen</span><span class="p">(</span><span class="n">plainText</span><span class="p">)</span> <span class="o">+</span> <span class="n">pad</span><span class="p">)</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+                <span class="n">txt_in</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">((</span><span class="n">pad</span><span class="o">/</span><span class="mi">8</span> <span class="o">+</span> <span class="n">strlen</span><span class="p">(</span><span class="n">plainText</span><span class="p">))</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+        
+                <span class="cm">/* null all chars in string */</span>
+                <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">pad</span><span class="o">/</span><span class="mi">8</span> <span class="o">+</span> <span class="n">strlen</span><span class="p">(</span><span class="n">plainText</span><span class="p">));</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+            
+                    <span class="n">txt_in</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\000&#39;</span><span class="p">;</span>
+            
+                <span class="p">}</span>
+        
+                <span class="cm">/* cpy plainText into txt_in thus creating a string buffer of correct </span>
+<span class="cm">                   size</span>
+<span class="cm">                */</span>
+                <span class="n">strncpy</span><span class="p">(</span><span class="n">txt_in</span><span class="p">,</span> <span class="n">plainText</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">plainText</span><span class="p">));</span>
+                <span class="n">free</span><span class="p">(</span><span class="n">plainText</span><span class="p">);</span>
+                <span class="n">plainText</span> <span class="o">=</span> <span class="n">txt_in</span><span class="p">;</span>
+
+                <span class="cm">/* Disassemble text */</span>
+                <span class="n">encode</span><span class="p">(</span><span class="n">encoded_text</span><span class="p">,</span> <span class="n">plainText</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">plainText</span><span class="p">)</span> <span class="o">+</span> <span class="n">pad</span><span class="o">/</span><span class="mi">8</span><span class="p">);</span>
+        
+        
+                <span class="cm">/* Here I iteratively encrypt the encoded plaintext 64 bits at a time</span>
+<span class="cm">                   by passing 64 bytes at a time</span>
+<span class="cm">                 */</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Encrypting...&quot;</span><span class="p">);</span>            
+                <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>        
+        
+                <span class="k">while</span><span class="p">(</span><span class="n">offset</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">plainText</span><span class="p">)</span><span class="o">*</span><span class="mi">8</span> <span class="o">+</span> <span class="n">pad</span><span class="p">)</span> <span class="p">){</span>
+        
+                    <span class="n">encrypt</span><span class="p">((</span><span class="n">encoded_text</span><span class="o">+</span><span class="n">offset</span><span class="p">),</span> <span class="n">ENCODE</span><span class="p">);</span>
+                    <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="mi">64</span><span class="p">;</span>
+            
+                <span class="p">}</span>
+        
+                <span class="n">printf</span><span class="p">(</span><span class="s">&quot;OK</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+        
+                <span class="cm">/* now that the disassembled version of the plaintext is encrypted we convert </span>
+<span class="cm">                   it back.</span>
+<span class="cm">                 */</span>
+                <span class="n">txt_out</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">((</span><span class="n">pad</span><span class="o">/</span><span class="mi">8</span> <span class="o">+</span><span class="n">strlen</span><span class="p">(</span><span class="n">plainText</span><span class="p">))</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+                <span class="n">decode</span><span class="p">(</span><span class="n">txt_out</span><span class="p">,</span> <span class="n">encoded_text</span><span class="p">,</span> <span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">plainText</span><span class="p">)</span> <span class="o">+</span> <span class="n">pad</span><span class="o">/</span><span class="mi">8</span><span class="p">));</span>
+    
+                <span class="cm">/* This prints the decoded encrypted text to the file. Since the strlen()</span>
+<span class="cm">                   will not work on the encrypted text I pass the size of the plaintext</span>
+<span class="cm">                   plus padding </span>
+<span class="cm">                */</span>
+                <span class="n">printToFile</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">plainText</span><span class="p">)</span> <span class="o">+</span> <span class="n">pad</span><span class="o">/</span><span class="mi">8</span><span class="p">,</span> <span class="n">digestptr</span><span class="p">,</span> <span class="n">txt_out</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+        
+                <span class="cm">/* This frees all the allocated memory */</span>
+                <span class="n">free</span><span class="p">(</span><span class="n">txt_out</span><span class="p">);</span>
+                <span class="n">free</span><span class="p">(</span><span class="n">key_in</span><span class="p">);</span>
+                <span class="n">free</span><span class="p">(</span><span class="n">encoded_text</span><span class="p">);</span>
+                <span class="n">free</span><span class="p">(</span><span class="n">plainText</span><span class="p">);</span>
+
+            <span class="p">}</span>
+    
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="cm">/* if decrypt option is selected */</span>
+        <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="s">&quot;-d&quot;</span><span class="p">,</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">strlen</span><span class="p">(</span><span class="s">&quot;-d&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+            
+            <span class="kt">int</span> <span class="n">textlen</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">*</span><span class="n">tl</span><span class="p">;</span>
+            <span class="n">tl</span> <span class="o">=</span> <span class="n">textlen</span><span class="p">;</span>
+            <span class="n">textlen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    
+            <span class="cm">/* get the key to decrypt text with */</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Please enter the key: &quot;</span><span class="p">);</span>
+            <span class="n">key_in</span> <span class="o">=</span> <span class="n">getKey</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span>
+            <span class="n">encode</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">key_in</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span> 
+            <span class="n">setkey</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+    
+            <span class="cm">/* read text from file - digestptr also gets set to the hash and</span>
+<span class="cm">               textlen = tl gets set to lengeth of the decoded encrypted text</span>
+<span class="cm">            */</span>
+            <span class="n">txt_in</span> <span class="o">=</span> <span class="n">readFromFile</span><span class="p">(</span><span class="n">tl</span><span class="p">,</span> <span class="n">digestinptr</span><span class="p">,</span> <span class="n">txt_in</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+    
+            <span class="cm">/* allocate memory for the encoded and plain text */</span>
+            <span class="n">encoded_text</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">((</span><span class="n">textlen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+            <span class="n">plainText</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="n">textlen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    
+            <span class="cm">/* encode txt to disassembled version */</span>
+            <span class="n">encode</span><span class="p">(</span><span class="n">encoded_text</span><span class="p">,</span> <span class="n">txt_in</span><span class="p">,</span> <span class="n">textlen</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    
+            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Decrypting...&quot;</span><span class="p">);</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> 
+    
+            <span class="cm">/* Protect against bad memory access in encrypt. If result of &#39;if&#39; statement</span>
+<span class="cm">               is false then the file is corrupt</span>
+<span class="cm">             */</span> 
+            <span class="k">if</span><span class="p">((</span><span class="n">textlen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span><span class="o">%</span><span class="mi">64</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+    
+                <span class="k">while</span><span class="p">(</span><span class="n">offset</span> <span class="o">&lt;</span> <span class="n">textlen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">8</span><span class="p">){</span>
+        
+                    <span class="n">encrypt</span><span class="p">((</span><span class="n">encoded_text</span><span class="o">+</span><span class="n">offset</span><span class="p">),</span> <span class="n">DECODE</span><span class="p">);</span>
+                    <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="mi">64</span><span class="p">;</span>
+            
+                <span class="p">}</span>
+        
+                <span class="n">printf</span><span class="p">(</span><span class="s">&quot;OK</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    
+
+                <span class="cm">/* reassemble */</span>            
+                <span class="n">decode</span><span class="p">(</span><span class="n">plainText</span><span class="p">,</span> <span class="n">encoded_text</span><span class="p">,</span> <span class="n">textlen</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+
+                <span class="cm">/* check if the hashes match. the one from the file and the one computed </span>
+<span class="cm">                   by the MD5String() based on the decryped txt</span>
+<span class="cm">                 */</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Validating MD5 digest...&quot;</span><span class="p">);</span>
+
+                <span class="k">if</span><span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="n">digestinptr</span><span class="p">,</span> <span class="n">MDString</span><span class="p">(</span><span class="n">digestptr</span><span class="p">,</span> <span class="n">plainText</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+            
+                    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;OK</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+                    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Message follows:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+                    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span> <span class="n">plainText</span><span class="p">);</span>
+            
+                <span class="p">}</span><span class="k">else</span><span class="p">{</span>    
+            
+                    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hash invalid</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+    
+                <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Invalid file</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+        
+            <span class="p">}</span>
+
+    
+
+            <span class="cm">/* This frees all the allocated memory */</span>
+            <span class="n">free</span><span class="p">(</span><span class="n">encoded_text</span><span class="p">);</span>            
+            <span class="n">free</span><span class="p">(</span><span class="n">plainText</span><span class="p">);</span>
+            <span class="n">free</span><span class="p">(</span><span class="n">key_in</span><span class="p">);</span>
+            <span class="n">free</span><span class="p">(</span><span class="n">txt_in</span><span class="p">);</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Error: Usage: %s [-d/-e FILE]</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Reads from cmd line and if key is invalid length asks for reentry</span>
+<span class="cm"> * </span>
+<span class="cm"> * @param    min        minimum size the key can be</span>
+<span class="cm"> * @param    max        maximum size the key can be</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return            the entered key</span>
+<span class="cm"> * </span>
+<span class="cm"> * @note            returned ptr needs to be freed by user of this function</span>
+<span class="cm"> */</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">getKey</span><span class="p">(</span><span class="kt">int</span> <span class="n">min</span><span class="p">,</span> <span class="kt">int</span> <span class="n">max</span><span class="p">){</span>
+
+    <span class="kt">char</span> <span class="n">ch</span><span class="p">,</span> <span class="o">*</span><span class="n">buf</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">;</span>
+
+    <span class="cm">/* allocate memory for the key */</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">));</span>
+
+    <span class="cm">/* pad key with nulls */</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">max</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\000&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* read until return is entered */</span>
+    <span class="k">while</span> <span class="p">(</span> <span class="p">(</span> <span class="p">(</span><span class="n">ch</span> <span class="o">=</span> <span class="n">getchar</span><span class="p">())</span> <span class="o">!=</span> <span class="sc">&#39;\n&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">feof</span><span class="p">(</span><span class="n">stdin</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">ferror</span><span class="p">(</span><span class="n">stdout</span><span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+
+        <span class="cm">/* ensure we do not write past end of buffer */</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">max</span> <span class="p">)</span> <span class="p">{</span>
+            <span class="n">buf</span><span class="p">[</span><span class="n">index</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)</span><span class="n">ch</span><span class="p">;</span>
+        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+            <span class="n">index</span><span class="o">++</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span> 
+
+    <span class="cm">/* this checks that the string entered was indeed between the min and max</span>
+<span class="cm">       and if not asks for reentry.</span>
+<span class="cm">     */</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min</span> <span class="o">||</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="n">max</span><span class="p">){</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Please enter a key of 4 to 8 characters</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+
+        <span class="k">while</span> <span class="p">(</span> <span class="p">(</span> <span class="p">(</span><span class="n">ch</span> <span class="o">=</span> <span class="n">getchar</span><span class="p">())</span> <span class="o">!=</span> <span class="sc">&#39;\n&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">feof</span><span class="p">(</span><span class="n">stdin</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">ferror</span><span class="p">(</span><span class="n">stdout</span><span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+
+            <span class="cm">/* ensure we do not write past end of buffer */</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">max</span> <span class="p">)</span> <span class="p">{</span>
+                <span class="n">buf</span><span class="p">[</span><span class="n">index</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)</span><span class="n">ch</span><span class="p">;</span>
+            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+                <span class="n">index</span><span class="o">++</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> 
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">buf</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Reads plaintext from cmd line</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return            the entered text</span>
+<span class="cm"> * </span>
+<span class="cm"> * @note            returned ptr needs to be freed by user of this function</span>
+<span class="cm"> */</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">getPlaintext</span><span class="p">(){</span>
+
+    <span class="kt">char</span> <span class="o">*</span><span class="n">line</span><span class="p">,</span> <span class="o">*</span><span class="n">plainText</span><span class="p">;</span> <span class="c1">//TODO malloc</span>
+    <span class="kt">size_t</span> <span class="n">nbytes</span> <span class="o">=</span> <span class="mi">255</span><span class="p">;</span>
+    <span class="kt">ssize_t</span> <span class="n">bytes_read</span><span class="p">;</span>
+
+    <span class="cm">/* initially allocate memory here for the line read */</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="mi">255</span><span class="o">*</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">)));</span>
+    <span class="n">plainText</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="cm">/* run until a &#39;.&#39; is read */</span>
+    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="cm">/* getline will reallocate memory if line is too small (I love getline!)</span>
+<span class="cm">           but we need to free line later</span>
+<span class="cm">         */</span>
+        <span class="n">bytes_read</span> <span class="o">=</span> <span class="n">getline</span><span class="p">(</span><span class="o">&amp;</span><span class="n">line</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nbytes</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">bytes_read</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">{</span>
+    
+            <span class="cm">/* if end of input denoted by &#39;.&#39; */</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">&amp;&amp;</span> <span class="n">strspn</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s">&quot;.&quot;</span><span class="p">)){</span>
+        
+                <span class="k">if</span><span class="p">(</span><span class="n">plainText</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+        
+                    <span class="k">return</span> <span class="n">plainText</span><span class="p">;</span>
+            
+                <span class="p">}</span>
+        
+                <span class="cm">/* end of plain text */</span>
+                <span class="cm">/* need to free allocated memory */</span>
+                <span class="n">free</span><span class="p">(</span><span class="n">line</span><span class="p">);</span>
+                <span class="k">return</span> <span class="n">plainText</span><span class="p">;</span>
+    
+            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+    
+                <span class="cm">/* add line to buffer */</span>
+                <span class="n">plainText</span> <span class="o">=</span> <span class="n">addToBuffer</span><span class="p">(</span><span class="n">plainText</span><span class="p">,</span> <span class="n">line</span><span class="p">);</span>
+        
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Appends a line to a string buffer</span>
+<span class="cm"> *</span>
+<span class="cm"> * @bufferPtr        pointer to buffer to append to</span>
+<span class="cm"> * @addedStrPtr        pointer to string to append with</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return            the new buffer</span>
+<span class="cm"> * </span>
+<span class="cm"> * @note            returned ptr needs to be freed by user of this function</span>
+<span class="cm"> */</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">addToBuffer</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bufferPtr</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">addedStrPtr</span><span class="p">){</span>
+
+    <span class="kt">char</span> <span class="o">*</span><span class="n">retString</span><span class="p">;</span>
+
+    <span class="cm">/* allocate memory to size of buffer plus line */</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">bufferPtr</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">addedStrPtr</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+
+        <span class="n">retString</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">bufferPtr</span><span class="p">)</span> <span class="o">+</span> <span class="n">strlen</span><span class="p">(</span><span class="n">addedStrPtr</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+
+    <span class="p">}</span><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">addedStrPtr</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+
+        <span class="n">retString</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">calloc</span><span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">addedStrPtr</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+
+    <span class="p">}</span>
+
+
+    <span class="cm">/* if alloc worked */</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">retString</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+
+        <span class="cm">/* copy old buffer into new buffer */</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">bufferPtr</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+    
+            <span class="n">strncat</span><span class="p">(</span><span class="n">retString</span><span class="p">,</span> <span class="n">bufferPtr</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">bufferPtr</span><span class="p">));</span>
+            <span class="n">free</span><span class="p">(</span><span class="n">bufferPtr</span><span class="p">);</span>
+    
+        <span class="p">}</span>
+
+        <span class="cm">/* append if there is somthing to append */</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">addedStrPtr</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+
+            <span class="n">strncat</span><span class="p">(</span><span class="n">retString</span><span class="p">,</span> <span class="n">addedStrPtr</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">addedStrPtr</span><span class="p">));</span>
+
+        <span class="p">}</span>
+
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="s">&quot;Error: Memory allocation</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="p">}</span>    
+
+    <span class="k">return</span> <span class="n">retString</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+
+<span class="cm">/**</span>
+<span class="cm"> * Prints the size, hash (digest), encrypted text to file</span>
+<span class="cm"> *</span>
+<span class="cm"> * @textlen            length of the encrypted text</span>
+<span class="cm"> * @digestptr        pointer to the hash of the text</span>
+<span class="cm"> * @txt_out            the encrypted text</span>
+<span class="cm"> * @fileName        the file to write to</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return            0 is success</span>
+<span class="cm"> * </span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">printToFile</span><span class="p">(</span><span class="kt">int</span> <span class="n">textlen</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">digestptr</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">txt_out</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">fileName</span><span class="p">){</span>
+
+    <span class="kt">FILE</span> <span class="o">*</span><span class="n">output_file</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">mesglenbuf</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+    <span class="cm">/* calculate the number of bytes that will be written to the file */</span>
+    <span class="n">mesglenbuf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">textlen</span> <span class="o">+</span> <span class="mi">16</span> <span class="o">+</span> <span class="mi">4</span><span class="p">);</span>
+
+    <span class="cm">/* open the output file */</span>
+    <span class="n">output_file</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s">&quot;wb&quot;</span><span class="p">);</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">output_file</span><span class="p">)</span>  <span class="p">{</span>
+
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="s">&quot;Error: unable to open output file %s for writing</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">fileName</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="p">}</span>
+
+    <span class="n">fwrite</span><span class="p">(</span><span class="n">mesglenbuf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">mesglenbuf</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">output_file</span><span class="p">);</span>
+    <span class="n">fwrite</span><span class="p">(</span><span class="n">digestptr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">),</span> <span class="mi">16</span><span class="p">,</span> <span class="n">output_file</span><span class="p">);</span>
+    <span class="n">fwrite</span><span class="p">(</span><span class="n">txt_out</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">),</span><span class="n">textlen</span><span class="p">,</span> <span class="n">output_file</span><span class="p">);</span>
+
+    <span class="n">fclose</span><span class="p">(</span><span class="n">output_file</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Reads the size, hash (digest), encrypted text from a file</span>
+<span class="cm"> *</span>
+<span class="cm"> * @textlen            length of the encrypted text</span>
+<span class="cm"> * @digestptr        pointer to the hash of the text</span>
+<span class="cm"> * @txt_in            the encrypted text</span>
+<span class="cm"> * @fileName        the file to write to</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return            the encrypted text read from the file</span>
+<span class="cm"> *</span>
+<span class="cm"> * @note            returned ptr needs to be freed by user of this function</span>
+<span class="cm"> * </span>
+<span class="cm"> */</span>
+<span class="kt">char</span> <span class="o">*</span> <span class="n">readFromFile</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">textlen</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">digestptr</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">txt_in</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">fileName</span><span class="p">){</span>
+
+    <span class="kt">FILE</span> <span class="o">*</span><span class="n">input_file</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">mesglenbuf</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+    <span class="n">input_file</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s">&quot;rb&quot;</span><span class="p">);</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">input_file</span><span class="p">)</span>     <span class="p">{</span>
+
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="s">&quot;Error: unable to open output file %s for reading</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">fileName</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="p">}</span>
+
+    <span class="n">fread</span><span class="p">(</span><span class="n">mesglenbuf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">mesglenbuf</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">input_file</span><span class="p">);</span>
+    <span class="n">fread</span><span class="p">(</span><span class="n">digestptr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">),</span> <span class="mi">16</span><span class="p">,</span> <span class="n">input_file</span><span class="p">);</span>
+
+    <span class="n">txt_in</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">((</span><span class="n">mesglenbuf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span> <span class="p">);</span>
+    <span class="n">fread</span><span class="p">(</span><span class="n">txt_in</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">),</span> <span class="p">(</span><span class="n">mesglenbuf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">20</span><span class="p">),</span> <span class="n">input_file</span><span class="p">);</span>
+    <span class="n">textlen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesglenbuf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">20</span><span class="p">;</span>
+
+    <span class="n">fclose</span><span class="p">(</span><span class="n">input_file</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">txt_in</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Computes MD5 hash from string in</span>
+<span class="cm"> *</span>
+<span class="cm"> * @digestin    pointer to hash digest computed</span>
+<span class="cm"> * @string        pointer to the string to hash</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return        the hash digest pointer</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span> <span class="n">MDString</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">digestin</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">string</span><span class="p">){</span>
+
+    <span class="n">MD_CTX</span> <span class="n">context</span><span class="p">;</span>
+    <span class="c1">//unsigned char digest[16];</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">strlen</span> <span class="p">(</span><span class="n">string</span><span class="p">);</span>
+
+    <span class="n">MDInit</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">context</span><span class="p">);</span>
+    <span class="n">MDUpdate</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">context</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+    <span class="n">MDFinal</span> <span class="p">(</span><span class="n">digestin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">context</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">digestin</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+
+<span class="cm">/**</span>
+<span class="cm"> * Calculates the base to the power of n</span>
+<span class="cm"> *</span>
+<span class="cm"> * @base    The base to multiply</span>
+<span class="cm"> * @n        The number of times to multiply</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return    The result</span>
+<span class="cm"> * </span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">power</span><span class="p">(</span><span class="kt">int</span> <span class="n">base</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">){</span>
+
+    <span class="kt">int</span> <span class="n">p</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">n</span><span class="p">){</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">base</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * converts a byte to a binary string. e.g. converts &#39;F&#39; to &quot;01000110&quot;</span>
+<span class="cm"> *</span>
+<span class="cm"> * @s    the resulting binary repersentation</span>
+<span class="cm"> * @b    the byte to be convertef</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">byte2bin</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">b</span><span class="p">){</span>
+
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+
+    <span class="cm">/* mask = 10000000 binary */</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">mask</span> <span class="o">=</span> <span class="mh">0x80</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">){</span>
+
+        <span class="cm">/* if bitewise AND of b with 10000000 &gt; 0 then msb is &#39;\1&#39;</span>
+<span class="cm">         * if bitewise AND of b with 010000000 &gt; 0 then msb - 1 is &#39;\1&#39;</span>
+<span class="cm">         * etc.</span>
+<span class="cm">         * we compare b &amp; 10000000, 01000000, 00100000 etc. (achieved by &gt;&gt;) </span>
+<span class="cm">         */</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">b</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">){</span>
+
+            <span class="o">*</span><span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="sc">&#39;\1&#39;</span><span class="p">;</span>
+
+        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+
+            <span class="o">*</span><span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+
+        <span class="p">}</span>
+
+        <span class="n">mask</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * converts a binary string to a byte. e.g. converts &quot;01000110&quot; to &#39;F&#39;</span>
+<span class="cm"> *</span>
+<span class="cm"> * @s    binary string to be converted to byte</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return    the resulting byte</span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">bin2byte</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">s</span><span class="p">){</span>
+
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="cm">/* for every bit set to 1 we add 2^j because that is the value of the bit */</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="sc">&#39;\1&#39;</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="n">j</span> <span class="o">=</span> <span class="mi">7</span> <span class="o">-</span> <span class="n">i</span><span class="p">;</span>
+            <span class="n">ret</span> <span class="o">+=</span> <span class="n">power</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">);</span>
+    
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">ret</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * converts a string to a binary repersentation of the string in 8 byte blocks. </span>
+<span class="cm"> * for every 8 bytes (8 characters) it will create a 64 bit binary repersentation</span>
+<span class="cm"> * of the bytes.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @s_out    the binary string repersentation of the character bytes</span>
+<span class="cm"> * @s_in    the character string to be transformed</span>
+<span class="cm"> *</span>
+<span class="cm"> * @note    s_in should be a multiple of 64 bits i.e. textlen mod 64 = 0</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">encode</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">s_out</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">s_in</span><span class="p">,</span> <span class="kt">int</span> <span class="n">textlen</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="kt">int</span> <span class="n">h</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">h</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="n">textlen</span><span class="p">;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">+</span><span class="mi">8</span><span class="p">){</span>
+
+        <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="n">j</span> <span class="o">=</span> <span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="n">h</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span><span class="p">);</span>
+    
+            <span class="k">if</span><span class="p">((</span><span class="n">j</span> <span class="o">&gt;=</span> <span class="n">textlen</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span> <span class="o">||</span> <span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="n">h</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">textlen</span><span class="p">)){</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+        
+            <span class="n">byte2bin</span><span class="p">(</span><span class="n">s_out</span> <span class="o">+</span> <span class="n">j</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="n">s_in</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">h</span><span class="p">)));</span>
+    
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * converts a binary string repersentation to a byte array (character string).</span>
+<span class="cm"> * for every 8 bits (1 characters) it will create a 1 byte character repersentation</span>
+<span class="cm"> * of the string.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @s_out    character bytes transformed from the binary string</span>
+<span class="cm"> * @s_in    the binary string repersentation of character bytes</span>
+<span class="cm"> *</span>
+<span class="cm"> * @note    s_in should be a multiple of 64 i.e. bytelen mod 64 = 0</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">decode</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">s_out</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">s_in</span><span class="p">,</span> <span class="kt">int</span> <span class="n">bytelen</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="kt">int</span> <span class="n">h</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">for</span><span class="p">(</span><span class="n">h</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="n">bytelen</span><span class="p">;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">+</span><span class="mi">8</span><span class="p">){</span>
+
+        <span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="n">j</span> <span class="o">=</span> <span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="n">h</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span><span class="p">);</span>
+    
+            <span class="k">if</span><span class="p">((</span><span class="n">j</span> <span class="o">&gt;=</span> <span class="n">bytelen</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span> <span class="o">||</span> <span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="n">h</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">bytelen</span><span class="p">)){</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+    
+            <span class="o">*</span><span class="p">(</span><span class="n">s_out</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">h</span><span class="p">))</span> <span class="o">=</span> <span class="n">bin2byte</span><span class="p">(</span><span class="n">s_in</span> <span class="o">+</span> <span class="n">j</span><span class="p">);</span>
+    
+    
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre>
+</div>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/04/secure-authenticated-message-transfer';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

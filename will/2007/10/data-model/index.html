@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Data Model</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/10/data-model">Data Model</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on October 29, 2007
+</div>
+  <p>So I did some research on how to implement my back end. I have decided to use the<a href="http://java.sun.com/blueprints/corej2eepatterns/Patterns/DataAccessObject.html"> Data Access Object pattern</a> to implement the model.</p>
+<p>Here is my Entity-Relationship Diagram<br />
+<a href="/cs/gif-1.gif"><img src="/cs/gif-1.gif" alt="gif_1.gif" border="0" width="550" height="569" /></a><br />
+I will implement a <span class="caps">DAO</span> for many of these models. And some DAO&#8217;s may access more than one ER.</p>
+<p>For example I implemented the <span class="caps">DAO</span> for the EPLPlayer as follows</p>
+<div class="highlight"><pre><code class="java"><span class="n">factory</span><span class="o">=(</span><span class="n">PlayerManagerFactoryIF</span><span class="o">)</span><span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="n">name</span><span class="o">).</span><span class="na">newInstance</span><span class="o">();</span>
+<span class="n">playerManager</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="na">createPlayerManager</span><span class="o">();</span>
+</code></pre>
+</div><p>The type of player manager can be read from a properties file (<code>name</code> is of type <code>String</code>). To develop the front end I created <code>SimplePlayerManager</code> which implements the interface <code>PlayerManagerIF</code></p>
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">PlayerManagerIF</span> <span class="o">{</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * creates an EPLPlayer based on the parameters in the </span>
+<span class="cm">   * playerDetails</span>
+<span class="cm">   * </span>
+<span class="cm">   * @param playerDetails</span>
+<span class="cm">   * @throws DaoException</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">createPlayer</span><span class="o">(</span><span class="n">String</span> <span class="n">email</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">String</span> <span class="n">password</span><span class="o">,</span>
+                       <span class="kt">boolean</span> <span class="n">administrator</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">DaoException</span><span class="o">;</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Updates an EPLPlayer based on the parameters set in the </span>
+<span class="cm">   * playerDetails</span>
+<span class="cm">   * </span>
+<span class="cm">   * @param playerDetails</span>
+<span class="cm">   * @throws DaoException</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">updatePlayer</span><span class="o">(</span><span class="n">String</span> <span class="n">email</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">String</span> <span class="n">password</span><span class="o">,</span> 
+                      <span class="kt">boolean</span> <span class="n">administrator</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">DaoException</span><span class="o">;</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * delete the EPLPlayer from the manager</span>
+<span class="cm">   * @param enailAddress</span>
+<span class="cm">   * @throws DaoException</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">deletePlayer</span><span class="o">(</span><span class="n">String</span> <span class="n">emailAddress</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">DaoException</span><span class="o">;</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Get the EPLPlayer based on the email address</span>
+<span class="cm">   * @return an EPLPlayer</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="n">EPLPlayer</span> <span class="nf">getPlayer</span><span class="o">(</span><span class="n">String</span> <span class="n">emailAddress</span><span class="o">);</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * get all the players </span>
+<span class="cm">   * @return a Collection of EPLPlayers</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">EPLPlayer</span><span class="o">&gt;</span> <span class="n">getAll</span><span class="o">();</span>    
+<span class="o">}</span>
+</code></pre>
+</div><p>This <code>SimplePlayerManager</code> just hard codes some basic setup so that I can concentrate on developing the Controller and View. I will eventually implement a <code>JDBCPlayerManager</code> that will access a MySql database.</p>
+<p>This pattern decouples the model from the view and even the controlled. In the controller I can specify which <span class="caps">DAO</span> type I want to use. Everything else stays the same. As well as helping me implement a <code>SimplePlayerManager</code> for prototyping it also provides maintainability to the application. If we needed to change the model to a file or a different database then that would be possible without having to change a lot of code. All we would need to do is implement a new <span class="caps">DAO</span> (e.g. <code>XMLFilePlayerManager</code>) and then change the properties file. There will be no code change for the rest of the project.</p>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/10/data-model';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

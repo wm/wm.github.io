@@ -1,0 +1,435 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Mvc Dev In Ruby</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2010/04/mvc-dev-in-ruby">Mvc Dev In Ruby</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on April 11, 2010
+</div>
+  <p>Ruby is dynamic object-orientated language that has a simple and elegant syntax enabling users to write beautiful code. Cocoa is Apple’s object-orientated Model View Controller (MVC) framework for building applications for MAC OS X. Cocoa is implemented in Objective-C, an object-orientated language that is compiled at run time like Ruby.</p>
+
+<p>RubyCocoa is a bridge between the Ruby language and the Objective-C needed by Cocoa. It provides a way to write beautifully coded and beautiful looking Mac OS X applications with the same behaviors and appearances as native Mac applications.</p>
+
+<h2 id='introduction'>Introduction</h2>
+
+<p>The Ruby language has seen a resurgence in its popularity over the last few years because of popular web frameworks like Ruby On Rails (RoR) and Merb. Having a background in RoR, RubyCocoa provides a straightforward way of transitioning to Mac OS X development. Cocoa is a Model, View and Controller framework not unlike Ruby on Rails. I will explain the concept of Model-View-Controller architecture, talk about why the Ruby On Rails framework is so popular and show how to use the same architecture concepts to create beautiful MAC OSX applications with Ruby Cocoa.</p>
+
+<p>I will also give a basic introduction on how to use the Cocoa framework with Ruby Cocoa using XCode and Interface Builder. The application that is referred to in this paper is called MovieStore and was the project for COMP 120 Databases course at Tufts. The code is hosted at http://github.com/wmernagh/MovieStore.</p>
+
+<h2 id='model_view_controller'>Model View Controller</h2>
+
+<p>The purpose of the MVC framework is to separate concerns in order to make development and maintenance less challenging. It separates the business logic and data from the presentation of data in the user interface.</p>
+
+<p>The <strong>Model</strong> is the representation of the applications data. All persistent data becomes part of the model. The model also provides an interface to access the data and handles the retrieval and persistence of the data (the business logic of the application). The model is unaware of how the data will be displayed in the User Interface (UI). It just provides ways to access, and modify it. In most applications all classes of data will provide basic CRUD (Create, Retrieve, Update, Destroy) operations.</p>
+
+<p>The <strong>View</strong> is the presentation logic of the application. The view retrieves data from the model and renders it in the UI. It also provides a UI for modifying data and sends modified data back to the Model. It is not concerned with checking the validity of the data just with presenting it to the user. Nor is the view concerned with any other business logic. If the business logic changes in the model it will not affect the view which just presents whatever data it can retrieve. There can be multiple views for a single model, each one presenting the data in a different ways (i.e. a photo application may present an album as a list of thumbs, a slide show, etc.)</p>
+
+<p>The <strong>Controller</strong> provides the connection between the model and the view. All application requests are sent through the controller. The controller retrieves the correct data from the model based on the view to be rendered. It will also determine which view to display based on the action requested and the requester.</p>
+
+<h2 id='ruby_on_rails'>Ruby on Rails</h2>
+
+<p>Ruby on Rails has become a very popular web development framework. It is a MVC framework that preaches the philosophy of &#8220;Convention over Configuration&#8221; CoC and the principle of &#8220;Don&#8217;t Repeat Yourself&#8221; DRY. The CoC means that a developer only needs to specify non-conventional parts of their application. For example, an application with a Movie model will have a table called Movies in the database. If the table was called videos then the developer would have to specify that but the convention expects movies (pluralization of the Model name). It encourages the MVC framework by providing the developer with the skeleton of an MVC application and a scaffolding mechanism. The scaffold will generate the Model, Controller and CRUD views needed. All that developer is required to do is specify the attributes of the model.</p>
+<div class='highlight'><pre><code class='bash'>  <span class='nv'>$ </span>ruby ./script/generate scaffold Actor first_name:string <span class='se'>\</span>
+  last_name:string dob:date
+  exists  app/models/
+  exists  app/controllers/
+  exists  app/helpers/
+  create  app/views/actors
+  exists  app/views/layouts/
+  exists  <span class='nb'>test</span>/functional/
+  exists  <span class='nb'>test</span>/unit/
+  exists  <span class='nb'>test</span>/unit/helpers/
+  exists  public/stylesheets/
+  create  app/views/actors/index.html.erb
+  create  app/views/actors/show.html.erb
+  create  app/views/actors/new.html.erb
+  create  app/views/actors/edit.html.erb
+  create  app/views/layouts/actors.html.erb
+  identical  public/stylesheets/scaffold.css
+  create  app/controllers/actors_controller.rb
+  create  <span class='nb'>test</span>/functional/actors_controller_test.rb
+  create  app/helpers/actors_helper.rb
+  create  <span class='nb'>test</span>/unit/helpers/actors_helper_test.rb
+  route  map.resources :actors
+  dependency  model
+  exists    app/models/
+  exists    <span class='nb'>test</span>/unit/
+  exists    <span class='nb'>test</span>/fixtures/
+  create    app/models/actor.rb
+  create    <span class='nb'>test</span>/unit/actor_test.rb
+  create    <span class='nb'>test</span>/fixtures/actors.yml
+  exists    db/migrate
+  create    db/migrate/20100411200441_create_actors.rb
+</code></pre>
+</div>
+<p>Once the scaffolding is in place for all models the developer can add the business logic to each model (validations and associations). That then just leaves UI design and some tweaking. Rails also offers conventions for implementing the necessary validations and associations.</p>
+
+<h4 id='associations'>Associations</h4>
+
+<p>Connecting models together logically. e.g. A movie can have many actors and an actor can be in many movies. So there is an obvious many-to-many relationship. The convention in Rails would be to have three tables representing the models movies and actors, as well as a table to associate them together called actors_movies. Then two classes called Movie and Actor are updated as follows in order to make the association.</p>
+<div class='highlight'><pre><code class='ruby'>  <span class='k'>class</span> <span class='nc'>Movie</span> <span class='o'>&lt;</span> <span class='no'>ActiveRecord</span><span class='o'>::</span><span class='no'>Base</span>
+  <span class='err'>  </span>  <span class='n'>has_and_belongs_to_many</span> <span class='ss'>:actors</span>
+  <span class='k'>end</span>
+</code></pre>
+</div><div class='highlight'><pre><code class='ruby'>  <span class='k'>class</span> <span class='nc'>Actor</span> <span class='o'>&lt;</span> <span class='no'>ActiveRecord</span><span class='o'>::</span><span class='no'>Base</span>
+  <span class='err'>  </span>  <span class='n'>has_and_belongs_to_many</span> <span class='ss'>:movies</span>
+  <span class='k'>end</span>
+</code></pre>
+</div>
+<p>The attributes of a model are determined by doing an SQL show command on the DB. This is done behind the scenes and the developer need not be concerned with it. The schema from the scaffold command above will look like the following.</p>
+<div class='highlight'><pre><code class='bash'>  movies   actors       <span class='nv'>actors_movies</span>
+  <span class='o'>================================</span>
+  id       id           actor_id
+  title    first_name   movie_id
+  year     last_name   
+  genre    dob
+</code></pre>
+</div>
+<p>Now the code to access attributes of the models and their associations is nice and simple.</p>
+<div class='highlight'><pre><code class='ruby'>  <span class='n'>a_movie</span> <span class='o'>=</span> <span class='no'>Movie</span><span class='o'>.</span><span class='n'>new</span>
+  <span class='n'>a_movie</span><span class='o'>.</span><span class='n'>title</span> <span class='o'>=</span> <span class='s1'>&#39;Avatar&#39;</span>
+  <span class='n'>a_movie</span><span class='o'>.</span><span class='n'>year</span> <span class='o'>=</span> <span class='s1'>&#39;2009&#39;</span>
+  <span class='n'>a_movie</span><span class='o'>.</span><span class='n'>save</span>
+
+  <span class='n'>an_actor</span> <span class='o'>=</span> <span class='no'>Actor</span><span class='o'>.</span><span class='n'>new</span>
+  <span class='n'>an_actor</span><span class='o'>.</span><span class='n'>first_name</span> <span class='o'>=</span> <span class='s1'>&#39;Peter&#39;</span>
+  <span class='n'>an_actor</span><span class='o'>.</span><span class='n'>last_name</span> <span class='o'>=</span> <span class='s1'>&#39;Smith&#39;</span>
+  <span class='n'>an_actor</span><span class='o'>.</span><span class='n'>save</span>
+
+  <span class='n'>a_movie</span><span class='o'>.</span><span class='n'>actors</span> <span class='c1'>#=&gt; []</span>
+
+  <span class='n'>a_movie</span><span class='o'>.</span><span class='n'>actors</span> <span class='o'>&lt;&lt;</span> <span class='n'>an_actor</span>
+  <span class='n'>a_movie</span><span class='o'>.</span><span class='n'>actors</span> <span class='c1'>#=&gt; [&lt;Actor first_name =&gt; &#39;Peter&#39;...&gt;]</span>
+
+  <span class='n'>a_movie</span><span class='o'>.</span><span class='n'>actors</span><span class='o'>.</span><span class='n'>first</span> <span class='o'>==</span> <span class='n'>an_actor</span> <span class='c1'>#=&gt; true</span>
+  <span class='n'>an_actor</span><span class='o'>.</span><span class='n'>movies</span><span class='o'>.</span><span class='n'>first</span> <span class='o'>==</span> <span class='n'>a_movie</span> <span class='c1'>#=&gt; true </span>
+</code></pre>
+</div>
+<h4 id='validations'>Validations </h4>
+
+<p>Validations are used to ensure that all data is present and in the correct format prior to persisting it. Rails provides the developer with tools to easily validate their models prior to persisting them. This, a long with the association tools sown above, abstracts the persistence layer out of the code (For the most part - for performance the developer will need to have some knowledge of the underlying DB. Although with the upcoming Rails 3 and <a href='http://github.com/rails/arel'>Arel</a> that will change for the better by ). </p>
+
+<p>Updating the model code above to apply some validation</p>
+<div class='highlight'><pre><code class='ruby'>  <span class='k'>class</span> <span class='nc'>Actor</span> <span class='o'>&lt;</span> <span class='no'>ActiveRecord</span><span class='o'>::</span><span class='no'>Base</span>
+  <span class='err'>  </span><span class='n'>has_and_belongs_to_many</span> <span class='ss'>:movies</span>
+  <span class='err'>  </span><span class='n'>validates_presence_of</span> <span class='ss'>:first_name</span><span class='p'>,</span> <span class='ss'>:last_name</span><span class='p'>,</span> <span class='ss'>:dob</span>
+  <span class='err'>  </span><span class='n'>validates_uniqueness_of</span> <span class='ss'>:first_name</span><span class='p'>,</span> <span class='ss'>:scope</span> <span class='o'>=&gt;</span> <span class='ss'>:last_name</span>
+  <span class='k'>end</span>
+  
+  <span class='k'>class</span> <span class='nc'>Movie</span> <span class='o'>&lt;</span> <span class='no'>ActiveRecord</span><span class='o'>::</span><span class='no'>Base</span>
+  <span class='err'>  </span><span class='n'>has_and_belongs_to_many</span> <span class='ss'>:actors</span>
+  <span class='err'>  </span><span class='n'>validates_presence_of</span> <span class='ss'>:title</span><span class='p'>,</span> <span class='ss'>:year</span>
+  <span class='err'>  </span><span class='n'>validates_uniqueness_of</span> <span class='ss'>:title</span><span class='p'>,</span> <span class='ss'>:scope</span> <span class='o'>=&gt;</span> <span class='ss'>:year</span>
+  <span class='k'>end</span>
+</code></pre>
+</div>
+<p>Validations are run whenever a persistence method is called (create, create!, update, update!, save, save!, etc.). For each persistence method there are two forms (e.g. create and create!). The methods followed by an ! will throw an Exception if the validation fails and rollback the current transaction. The methods without the ! will return true if valid, or false if invalid and rollback the current transaction. </p>
+
+<p>All ActiveRecord inherited models have a reference to their ActiveRecord::Errors object. This object gets updated with the validation errors that resulted form calling the above methods. This can then be used to inform the user as to what the reason for the failed method call was. Each validation has a specific error message which can be overwritten either in the declaration of the validation (not recommended) or in a localization file.</p>
+
+<h4 id='embedded_ruby_erb'>Embedded Ruby (.erb)</h4>
+
+<p>The views in Rails can contain embedded ruby code similar to PHP and ASP. The code is surrounded by &lt;% %&gt; or &lt;%= %&gt;. The former is used for code that does not return text and the latter is used for writing text to the page.</p>
+
+<p>Here is a simple example of how to print the actors in a movie. (taken from the show.html.erb file)</p>
+<div class='highlight'><pre><code class='erb'><span class='x'>  &lt;ul&gt;</span>
+<span class='x'>  </span><span class='cp'>&lt;%</span> <span class='vi'>@movie</span><span class='o'>.</span><span class='n'>actors</span><span class='o'>.</span><span class='n'>each</span> <span class='k'>do</span> <span class='o'>|</span><span class='n'>actor</span><span class='o'>|</span> <span class='cp'>%&gt;</span><span class='x' />
+<span class='x'>    &lt;li&gt;</span><span class='cp'>&lt;%=</span> <span class='n'>actor</span><span class='o'>.</span><span class='n'>last_name</span> <span class='cp'>%&gt;</span><span class='x'>, </span><span class='cp'>&lt;%=</span> <span class='n'>actor</span><span class='o'>.</span><span class='n'>first_name</span> <span class='cp'>%&gt;</span><span class='x'>&lt;/li&gt;</span>
+<span class='x'>  </span><span class='cp'>&lt;%</span> <span class='k'>end</span> <span class='cp'>%&gt;</span><span class='x' />
+<span class='x'>  &lt;/ul&gt;</span>
+</code></pre>
+</div>
+<h4 id='actions'>Actions</h4>
+
+<p>Rails is a <a href='http://en.wikipedia.org/wiki/Representational_State_Transfer'>RESTful</a> web application framework providing actions to be requested by users (via a browser for example). An action is a controller method that can be executed by a user via some widget in the view or by an API call.</p>
+
+<p>Execution of an action in a Rails application is called by a request to the the url path with one of  the following HTTP methods (POST, GET, DELETE, PUT). For the action to be called the view needs to provide a submit button, a link, or some JavaScript callback to send a request to a path on the server. </p>
+
+<p>In rails the convention for controllers is to have the following actions (you can add more by creating a public method and updating the routes.yml file)</p>
+<div class='highlight'><pre><code class='bash'>        
+          Controller  Route 
+  Action  Method      Path                  Example Path       HTTP <span class='nv'>Method</span>
+  <span class='o'>========================================================================</span>
+  index   index       :controller/          /movies/          GET
+  show    show        :controller/:id       /movies/2192      GET
+  new     new         :controller/new       /movies/new       GET
+  create  create      :controller/          /movies/          POST
+  edie    edit        :controller/:id/edit  /movies/2192/edit GET
+  update  update      :controller/:id       /movies/2192      PUT
+  delete  destroy     :controller/:id       /movies/2192      DELETE
+</code></pre>
+</div>
+<p>In the running example if we wanted to see the details of the movie &#8220;Avatar&#8217; we would enter the path &#8216;/movies/2192&#8217; into our browser (the full url would look something like http://www.example.com/movies/2192) where &#8216;Avatar&#8217; has the id <em>2192</em> in the database.</p>
+
+<p>If the above path is called with a GET request it will then be routed to the controller MoviesController and to the show action. Again this is because of convention.</p>
+<div class='highlight'><pre><code class='ruby'>  <span class='k'>def</span> <span class='nf'>show</span>
+  <span class='err'>  </span><span class='vi'>@movie</span> <span class='o'>=</span> <span class='no'>Movie</span><span class='o'>.</span><span class='n'>find</span><span class='p'>(</span><span class='n'>params</span><span class='o'>[</span><span class='ss'>:id</span><span class='o'>]</span><span class='p'>)</span>
+  <span class='err'>  </span><span class='n'>respond_to</span> <span class='k'>do</span> <span class='o'>|</span><span class='nb'>format</span><span class='o'>|</span>
+  <span class='err'>    </span><span class='nb'>format</span><span class='o'>.</span><span class='n'>html</span> <span class='c1'>#=&gt; By default this will render show.html.erb</span>
+  <span class='err'>    </span><span class='nb'>format</span><span class='o'>.</span><span class='n'>xml</span>  <span class='p'>{</span> <span class='n'>render</span> <span class='ss'>:xml</span> <span class='o'>=&gt;</span> <span class='vi'>@movie</span> <span class='p'>}</span>
+  <span class='err'>  </span><span class='k'>end</span>
+  <span class='k'>end</span>
+</code></pre>
+</div>
+<p>The show action is used to render a particular view and to populate the variables needed by that view. The convention would render a view of the same name as the action. So show.html.erb in this example.</p>
+
+<p>If the above path is called with a PUT request it will then be routed to the movies controller and to the update action. </p>
+<div class='highlight'><pre><code class='ruby'>  <span class='k'>def</span> <span class='nf'>update</span>
+  <span class='err'>  </span><span class='vi'>@movie</span> <span class='o'>=</span> <span class='no'>Movie</span><span class='o'>.</span><span class='n'>find</span><span class='p'>(</span><span class='n'>params</span><span class='o'>[</span><span class='ss'>:id</span><span class='o'>]</span><span class='p'>)</span>
+   
+  <span class='err'>  </span><span class='n'>respond_to</span> <span class='k'>do</span> <span class='o'>|</span><span class='nb'>format</span><span class='o'>|</span>
+  <span class='err'>    </span><span class='k'>if</span> <span class='vi'>@movie</span><span class='o'>.</span><span class='n'>update_attributes</span><span class='p'>(</span><span class='n'>params</span><span class='o'>[</span><span class='ss'>:movie</span><span class='o'>]</span><span class='p'>)</span>
+  <span class='err'>      </span><span class='n'>flash</span><span class='o'>[</span><span class='ss'>:notice</span><span class='o'>]</span> <span class='o'>=</span> <span class='s1'>&#39;Movie was successfully updated.&#39;</span>
+  <span class='err'>      </span><span class='nb'>format</span><span class='o'>.</span><span class='n'>html</span> <span class='p'>{</span> <span class='n'>redirect_to</span><span class='p'>(</span><span class='vi'>@movie</span><span class='p'>)</span> <span class='p'>}</span>
+  <span class='err'>      </span><span class='nb'>format</span><span class='o'>.</span><span class='n'>xml</span>  <span class='p'>{</span> <span class='n'>head</span> <span class='ss'>:ok</span> <span class='p'>}</span>
+  <span class='err'>    </span><span class='k'>else</span>
+  <span class='err'>      </span><span class='nb'>format</span><span class='o'>.</span><span class='n'>html</span> <span class='p'>{</span> <span class='n'>render</span> <span class='ss'>:action</span> <span class='o'>=&gt;</span> <span class='s2'>&quot;edit&quot;</span> <span class='p'>}</span>
+  <span class='err'>      </span><span class='nb'>format</span><span class='o'>.</span><span class='n'>xml</span>  <span class='p'>{</span> <span class='n'>render</span> <span class='ss'>:xml</span> <span class='o'>=&gt;</span> <span class='vi'>@movie</span><span class='o'>.</span><span class='n'>errors</span><span class='p'>,</span> 
+          <span class='ss'>:status</span> <span class='o'>=&gt;</span> <span class='ss'>:unprocessable_entity</span> <span class='p'>}</span>
+  <span class='err'>    </span><span class='k'>end</span>
+  <span class='err'>  </span><span class='k'>end</span>
+  <span class='k'>end</span>
+</code></pre>
+</div>
+<p>The path &#8216;/movies/2192.xml&#8217; would map to the same actions but would return the movie model as xml.</p>
+
+<p>Not all methods in a controller are actions. To be considered an action a controller method must be public and there must be a path defined in the routes.yml file that maps to it. It is good practice to have all non action methods be private or protected.</p>
+
+<p>The controller passes data between Model and View in two ways. When a action is requested it connects data set in the View with the Model by reading parameters in the session (these get added to the params hash). It then connects data in the Model for use by the View by setting instance variables.</p>
+
+<h2 id='skinny_controllers_and_fat_models'>Skinny Controllers and Fat Models</h2>
+
+<p>Another principle that is popular in the Rails community is Skinny Controllers and Fat Models. This refers to the idea that most of the logic should be in the Models, cleaning up the Controller code allowing for grater code reuse. This principle is valid for all MVC applications not just the Rails framework. New developers tend to start with logic in the View, then move it to the controllers and finally as they get familiar with the benefits of the MVC framework they move it down to the Model. </p>
+
+<h2 id='the_cocoa_framework'>The Cocoa Framework</h2>
+
+<p>The Cocoa Framework also encourages the MVC pattern. It includes a graphical view builder called Interface Builder which can be used to create the View of the application. This can be done without any code allowing you to focus directly on the User Interface. The framework also provides a mechanism called bindings to connect your View to the controllers coded in Objective-C or Ruby. This is also a simple graphical step of dragging a &#8220;wire&#8221; from the one controller action to an object/widget in the view.  </p>
+
+<p>To create a new project open XCode -&gt; New Project</p>
+
+<p><img alt='New Project' src='http://farm2.static.flickr.com/1155/5100709046_c0379508c6.jpg' /></p>
+
+<p>Select Cocoa-Ruby Application and click &#8216;Choose&#8230;&#8217; name the project &#8216;Movies&#8217; and the following window will open.</p>
+
+<p><img alt='Choose' src='http://farm2.static.flickr.com/1387/5100709096_96d0ce8642.jpg' /></p>
+
+<h4 id='the_view'>The View</h4>
+
+<p>As mentioned above the View can be created using the a graphical tool called Interface Builder.  To open Interface Builder simply double click on the .nib file that is in XCode (It is named MainMenu.nib by default but can be renamed if wanted). </p>
+
+<p><img alt='Interface Builder' src='http://farm2.static.flickr.com/1050/5100709134_c00c67ef62.jpg' /></p>
+
+<p>Interface Builder will open with 5 windows (show above). The AppKit Library (left), Document Window (top center), Inspector (right), The applications menu (center), and the applications window (bottom center).</p>
+
+<p>The AppKit is a library of all the application widgets you will need (windows, panels, text boxes, tables, buttons, etc.). These objects can be dragged from the library into the application window.</p>
+
+<p><img alt='AppKit' src='http://farm2.static.flickr.com/1359/5100111171_d201d33949.jpg' /></p>
+
+<p>The figure below shows how you would drag a button widget from the library to a window, place it beside a password text field and edit it to say &#8216;Login&#8217;.</p>
+
+<p><img alt='widgets' src='http://farm2.static.flickr.com/1322/5100111269_db146b2f2d.jpg' /></p>
+
+<p>In order to create your applications View you can add the needed widgets, position and edit them (size, style, etc.). The AppKit will have all the widgets that you could need including nice table widgets that handle sorting, in-line cell editing, etc.  </p>
+
+<p>The one major downside to Interface Builder is that if you layer objects on top of each other it makes modifying the underlying objects difficult. You actually have to remove the object from the View that are on top of the object you would like to edit.</p>
+
+<h4 id='the_controller'>The Controller</h4>
+
+<p>The controller will be used to marshal the view, retrieve data from the model layer for the view, and to pass data from the view to the model layer. This adheres to the MVC architecture described earlier. To create a controller select File -&gt; New File in Xcode, then click on the Ruby NSObject subclass option and click Next and name your controller (e.g. ApplicationController)</p>
+
+<p><img alt='New File' src='http://farm2.static.flickr.com/1104/5100111301_58ee4a9f93.jpg' /></p>
+
+<p>This will generate the following code</p>
+<div class='highlight'><pre><code class='ruby'>  <span class='nb'>require</span> <span class='s1'>&#39;osx/cocoa&#39;</span>
+
+  <span class='k'>class</span> <span class='nc'>ApplicationController</span> <span class='o'>&lt;</span> <span class='no'>OSX</span><span class='o'>::</span><span class='no'>NSObject</span>
+  <span class='k'>end</span>
+</code></pre>
+</div>
+<p>Like Rails, Cocoa controllers will need to define actions. Unlike Rails where actions were defined by pubic methods in the Controller and a matching route in the routes.yml file, Cocoa controller actions are defined explicitly within the controller. This difference is due to the difference in the application space. Rails is a Web framework so needs to define actions accessible via a route, while Cocoa is a Desktop framework which does not.</p>
+
+<p>To define the actions you will need a public method with an extra definition above it. In the running example we need a login action, it can be defined as follows.</p>
+<div class='highlight'><pre><code class='ruby'>  <span class='nb'>require</span> <span class='s1'>&#39;osx/cocoa&#39;</span>
+  
+  <span class='k'>class</span> <span class='nc'>ApplicationController</span> <span class='o'>&lt;</span> <span class='no'>OSX</span><span class='o'>::</span><span class='no'>NSObject</span>
+  
+     <span class='n'>ib_action</span> <span class='ss'>:login</span>
+     <span class='k'>def</span> <span class='nf'>login</span> 
+       <span class='c1'># Do login here</span>
+     <span class='k'>end</span>
+  
+  <span class='k'>end</span>
+</code></pre>
+</div>
+<p>The extra definition is called ib_action which stands for Interface Builder action. This one line will make the action visible in Interface Builder.</p>
+
+<p>The next step is to connect the the login button in the view to the login action in the controller. In Rails this would be done by having the button either call a JS function, a link, or form submit button, that requests the correct path with the correct HTTP method. In Cocoa we use graphical wiring (called bindings) in Interface Builder.</p>
+
+<p><img alt='Document Window' src='http://farm2.static.flickr.com/1155/5100111353_55dd821e3f.jpg' /></p>
+
+<p>Going back to Interface Builder select the Classes tab from the Library Window, type in the name of the controller you just created and drag that controller into the Document Window. </p>
+
+<p>Once the controller is in the Document Window you can select it and access its actions in the Inspector. Click and hold the mouse button on the circle beside an action you then drag it to a widget in the View. In the example below we will wire up the Controller&#8217;s login action with the View&#8217;s login button.</p>
+
+<p><img alt='Wiring' src='http://farm2.static.flickr.com/1233/5100709398_60cb71df68.jpg' /></p>
+
+<p>The login button should flash showing you the connection worked and you can see the connection in the Inspector afterward.</p>
+
+<p><img alt='wired' src='http://farm5.static.flickr.com/4084/5100111409_e2cd144ca7.jpg' /></p>
+
+<p>You can connect multiple widgets to an action. So we may also want the user to login by hitting the enter key after typing the password. To do this we wire the text field to the login action also.</p>
+
+<p><img alt='wiring' src='http://farm2.static.flickr.com/1073/5100111447_f38ed40647.jpg' /></p>
+
+<p>Now that the actions are connected to the view there is still one more connection that needs to be made. In order for the controllers to pass data between View and Model there needs to be a set of variables associated with the view that can be accessed by the controller. </p>
+
+<p>In Rails this was done in two ways depending on the flow of the data (the params hash gets set for sending data from the View to the Controller and instance variables are set for sending data from the Controller to the View.)</p>
+
+<p>In Cocoa we create outlets in the controller that we can connect to widgets in the view. In our running example we will need a connect the Employee ID and the Password text fields to the ApplicationController so that the login Action can check their values. </p>
+
+<p>Outlets are added in the controller similar to actions and they can be accessed in the controller as instance variables.</p>
+
+<p>require &#8216;osx/cocoa&#8217;</p>
+<div class='highlight'><pre><code class='ruby'>   <span class='k'>class</span> <span class='nc'>ApplicationController</span> <span class='o'>&lt;</span> <span class='no'>OSX</span><span class='o'>::</span><span class='no'>NSObject</span>
+  <span class='n'>ib_outlets</span> <span class='ss'>:login_username</span><span class='p'>,</span> <span class='ss'>:login_password</span>
+ 
+  <span class='n'>ib_action</span> <span class='ss'>:login</span>
+  <span class='k'>def</span> <span class='nf'>login</span> 
+      <span class='n'>employee</span> <span class='o'>=</span> <span class='no'>Employee</span><span class='o'>.</span><span class='n'>find_by_id</span><span class='p'>(</span><span class='vi'>@login_username</span><span class='o'>.</span><span class='n'>stringValue_</span><span class='p'>)</span>
+      <span class='c1'># Do login here</span>
+  <span class='k'>end</span>
+   <span class='k'>end</span>
+</code></pre>
+</div>
+<p>Also note that there are some peculiarities when bridging form Objective-C to Ruby, for example to retrieve the string value of the outlet we use the stringValue method. Similarly when we want to set the value of a outlet we use the setStringValue method. Ruby developers may have expected that the @login_username would be cast to string by default but this is not the case.</p>
+
+<p>Now we need to wire the outlets to the View using Interface Builder. This is done in the same way that we bound the actions to the view.</p>
+
+<p><img alt='wiring' src='http://farm2.static.flickr.com/1142/5100111493_cd05fb1e50.jpg' /></p>
+
+<p>The difference between Rails and Cocoa in how they share data is somewhat due to the differences between Web and Desktop applications as well as having to integrate with Interface Builder.</p>
+
+<h4 id='the_model'>The Model</h4>
+
+<p>The model layer in Ruby Cocoa can be also take advantage of Rails. Rails uses the ActiveRecord Gem for its model layer. Ruby Cocoa developers can include this gem and use ActiveRecord also. This will provide all the validation, error, and association tools that were mentioned in the Rails section above.</p>
+
+<h4 id='cocoa_api'>Cocoa API</h4>
+
+<p>When using the Cocoa API with Ruby most of the functions that are available in Objective-C are also available in Ruby. The naming convention is to call the same method in Ruby with a trailing underscore. Some examples are</p>
+
+<p>deselectAll_ setHidden_ reloadData_ setStringValue_ stringValue_ tableView_objectValueForTableColumn_row_(view, col, row) tableViewSelectionDidChange_(notification) numberOfRowsInTableView_(view)</p>
+
+<h2 id='conclusion'>Conclusion</h2>
+
+<h4 id='mvc'>MVC</h4>
+
+<p>Both Rails and Cocoa provide a developer with good tools to begin programming maintainable applications by separating concerns. The developer is still required to adhere to the principle of Skinny Controllers and Fat Models to ensure the correct levels of modularization. Logic that slips into the Controller or View will be hard to locate and thus maintain. It will also lead to possible code duplication. By moving the logic down to the Model the code becomes more DRY.</p>
+
+<h4 id='mac_os_x_development'>Mac OS X Development</h4>
+
+<p>Ruby comes installed on all new Macs so developing applications in RubyCocoa should ensure that your application will work on them. Developers who utilize Ruby gems will need to package the gems with the code since it is unlikely that potential users will have the correct gems installed.</p>
+
+<p>RubyCocoa was an open source project started separately from Apple. Apple has since started work on a similar project called MacRuby and HotCocoa. MacRuby is version of Ruby 1.9 ported to run directly on top of core technologies such as Objective-C. HotCocoa is a thin &amp; idiomatic Ruby layer that sits above Cocoa and other frameworks. MacRuby 0.5 now supports <a href='http://www.macruby.org/blog/2010/01/31/macruby05.html'>HotCocoa</a>.</p>
+
+<p>HotCocoa used to be developed inside the MacRuby project, it has since been moved to GitHub, where it is far easier for developers to submit contributions.</p>
+
+<p>Developers can sign up to the developer connection at Apple for free and download the Cocoa SDK (XCode, Interface Builder, etc.) Rails is also installed on Mac OS X when you install the developer add-ons. </p>
+
+<h4 id='objectivec_the_next_step'>Objective-C the next step</h4>
+
+<p>It can often be hard for developers to start work in new environments and with new languages. For developers switching to Mac development and using Objective-C for the first time the learning curve is even steeper. Not only is there a new set of tools (Xcode, Interface Builder, etc.) to become familiar with but also a new language.</p>
+
+<p>However for Ruby developers especially those familiar with Rails there is a nice interim step that can be taken. Developers can create an application with RubyCocoa, learning the framework and the tools used. Then once proficient with these new technologies they can easily transition to building applications with Objective-C.</p>
+
+<h4 id='iphone_development'>iPhone Development</h4>
+
+<p>Unfortunately the iPhone cannot take advantage of RubyCocoa since the iPhone OS does not have Ruby installed. Perhaps when MacRuby comes out of beta we will see it but until then Objective-C is required to develop applications on the iPhone.</p>
+
+<p>Bibliography <a href='http://www.rubycocoa.com/an-introduction-to-rubycocoa/'>Programming Cocoa with Ruby – Brian Marick – prag prog – 2009</a></p>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2010/04/mvc-dev-in-ruby';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

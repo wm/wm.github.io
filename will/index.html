@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Will Mernagh</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+    <a href="https://github.com/wmernagh/blog">fork</a><br/>
+        <% if signed_in? -%>
+          <%= link_to "Sign out", sign_out_path, :method => :delete %>
+        <% else -%>
+          <%= link_to "Sign in", sign_in_path %>
+          <%= link_to "Sign up", sign_up_path %>
+        <% end -%>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<div class="related">
+  <ul>
+  
+    <li>
+      <span>March 28, 2011</span><a href="/will/2011/03/backup-strategy">My Backup Strategy</a>
+    </li>
+  
+    <li>
+      <span>January 21, 2011</span><a href="/will/2011/01/jQuery-hang-in-akephalos">Avoid jQuery Hanging in Akephalos</a>
+    </li>
+  
+    <li>
+      <span>January 13, 2011</span><a href="/will/2011/01/vim-open-into-and-update-all-buffers">How to apply changes to all VIM open buffers</a>
+    </li>
+  
+    <li>
+      <span>January 13, 2011</span><a href="/will/2011/01/convert-folder-into-git-submodule">Convert subfolder into Git submodule</a>
+    </li>
+  
+    <li>
+      <span>October 19, 2010</span><a href="/will/2010/10/Rebase-instead-Merge-for-pulls">Using Rebase instead of Merge for pulls</a>
+    </li>
+  
+    <li>
+      <span>September 15, 2010</span><a href="/will/2010/09/The-power-of-Boxcar-for-iPhone">The Power Of Boxcar For iPhone</a>
+    </li>
+  
+    <li>
+      <span>April 11, 2010</span><a href="/will/2010/04/mvc-dev-in-ruby">Mvc Dev In Ruby</a>
+    </li>
+  
+    <li>
+      <span>March 22, 2010</span><a href="/will/2010/03/Instapaper-is-my-Kindle%27s-best-friend">Instapaper Is My Kindle's Best Friend</a>
+    </li>
+  
+    <li>
+      <span>January 29, 2008</span><a href="/will/2008/01/using-ldap-to-authorize-svn">Using LDAP to authorize svn</a>
+    </li>
+  
+    <li>
+      <span>January 29, 2008</span><a href="/will/2008/01/setting-up-ldap-for-user-authentication">Setting up LDAP for user authentication</a>
+    </li>
+  
+    <li>
+      <span>December 16, 2007</span><a href="/will/2007/12/scm-bugtraq-websvn-wiki">SCM, Bugtraq, Websvn, Wiki</a>
+    </li>
+  
+    <li>
+      <span>December 14, 2007</span><a href="/will/2007/12/set-up-ssh-keys-for-passwd-free-login">Set up ssh keys for password free login</a>
+    </li>
+  
+    <li>
+      <span>November 27, 2007</span><a href="/will/2007/11/sorted-results-with-hibernate">Sorted results with Hibernate</a>
+    </li>
+  
+    <li>
+      <span>November 18, 2007</span><a href="/will/2007/11/revised-data-model-erd-2">Revised Data Model (ERD)</a>
+    </li>
+  
+    <li>
+      <span>November 17, 2007</span><a href="/will/2007/11/rollback-persistence-with-hibernate">Rollback persistence with Hibernate</a>
+    </li>
+  
+    <li>
+      <span>November 14, 2007</span><a href="/will/2007/11/hibernate-lazy-loading-issues">Hibernate - Lazy loading issues</a>
+    </li>
+  
+    <li>
+      <span>November  3, 2007</span><a href="/will/2007/11/removing-bad-line-breaks-in-text-files">Removing bad line breaks in text files</a>
+    </li>
+  
+    <li>
+      <span>November  2, 2007</span><a href="/will/2007/11/team-term-paper">Team Term Paper</a>
+    </li>
+  
+    <li>
+      <span>November  2, 2007</span><a href="/will/2007/11/latex">LaTeX</a>
+    </li>
+  
+    <li>
+      <span>October 31, 2007</span><a href="/will/2007/10/revised-data-model-erd">Revised Data Model (ERD)</a>
+    </li>
+  
+    <li>
+      <span>October 29, 2007</span><a href="/will/2007/10/mvc-revisited-struts">MVC Revisited (Struts)</a>
+    </li>
+  
+    <li>
+      <span>October 29, 2007</span><a href="/will/2007/10/data-model">Data Model</a>
+    </li>
+  
+    <li>
+      <span>October 10, 2007</span><a href="/will/2007/10/tei08">TEI'08</a>
+    </li>
+  
+    <li>
+      <span>October  9, 2007</span><a href="/will/2007/10/subversion-and-eclipse">Subversion and Eclipse</a>
+    </li>
+  
+    <li>
+      <span>October  9, 2007</span><a href="/will/2007/10/next-design-steps">Next Design Steps</a>
+    </li>
+  
+    <li>
+      <span>October  1, 2007</span><a href="/will/2007/10/class-diagram-epl">Class Diagram (EPL)</a>
+    </li>
+  
+    <li>
+      <span>September 27, 2007</span><a href="/will/2007/09/sequence-diagram-uml">Sequence Diagram (UML)</a>
+    </li>
+  
+    <li>
+      <span>September 26, 2007</span><a href="/will/2007/09/use-case-diagram-uml">Use Case Diagram (UML)</a>
+    </li>
+  
+    <li>
+      <span>September 26, 2007</span><a href="/will/2007/09/design-and-coding-tool-selection">Design and Coding Tool Selection</a>
+    </li>
+  
+    <li>
+      <span>September 18, 2007</span><a href="/will/2007/09/sda-project-proposal">SDA Project Proposal</a>
+    </li>
+  
+    <li>
+      <span>August  9, 2007</span><a href="/will/2007/08/wavetouch-software">WaveTouch: Software </a>
+    </li>
+  
+    <li>
+      <span>August  6, 2007</span><a href="/will/2007/08/tui-wave-overview">TUI Wave Overview</a>
+    </li>
+  
+    <li>
+      <span>August  5, 2007</span><a href="/will/2007/08/software-update">Software Update</a>
+    </li>
+  
+    <li>
+      <span>August  5, 2007</span><a href="/will/2007/08/design-changes">Design Changes</a>
+    </li>
+  
+    <li>
+      <span>July 31, 2007</span><a href="/will/2007/07/conceptual-prototype-presentation-waveform">Conceptual Prototype Presentation (waveform)</a>
+    </li>
+  
+    <li>
+      <span>July 24, 2007</span><a href="/will/2007/07/waveform-tac-palette">Waveform TAC Palette</a>
+    </li>
+  
+    <li>
+      <span>July 24, 2007</span><a href="/will/2007/07/waveform-dialog-and-task-diagrams">Waveform Dialog and Task Diagrams</a>
+    </li>
+  
+    <li>
+      <span>July 23, 2007</span><a href="/will/2007/07/waceform-conceptual-model">Waveform Conceptual Model</a>
+    </li>
+  
+    <li>
+      <span>July 17, 2007</span><a href="/will/2007/07/tangible-waveform-brainstorm-prototyping">Tangible Waveform - Brainstorm / Prototyping</a>
+    </li>
+  
+    <li>
+      <span>July 15, 2007</span><a href="/will/2007/07/tac-palette-and-dialog-diagram-for-comtouch">TAC Palette and Dialog Diagram for ComTouch</a>
+    </li>
+  
+    <li>
+      <span>June 22, 2007</span><a href="/will/2007/06/solitary-person-and-landmark-project-4">Solitary Person and Landmark - Project 4</a>
+    </li>
+  
+    <li>
+      <span>June 21, 2007</span><a href="/will/2007/06/lighting-in-photography-project-3">Lighting in Photography - Project 3</a>
+    </li>
+  
+    <li>
+      <span>June 16, 2007</span><a href="/will/2007/06/high-depth-of-field-project-2">High Depth of Field - Project 2</a>
+    </li>
+  
+    <li>
+      <span>June  4, 2007</span><a href="/will/2007/06/high-dynamic-range-project-1">High Dynamic Range - Project 1</a>
+    </li>
+  
+    <li>
+      <span>May 28, 2007</span><a href="/will/2007/05/re-order-rgb-in-picture">Re-order RGB in picture</a>
+    </li>
+  
+    <li>
+      <span>May 28, 2007</span><a href="/will/2007/05/camera-comparisons">Camera Comparisons</a>
+    </li>
+  
+    <li>
+      <span>April 22, 2007</span><a href="/will/2007/04/algorithms-project">Algorithms Project</a>
+    </li>
+  
+    <li>
+      <span>April 11, 2007</span><a href="/will/2007/04/secure-authenticated-message-transfer">Secure, Authenticated Message Transfer</a>
+    </li>
+  
+    <li>
+      <span>March 16, 2007</span><a href="/will/2007/03/network-attack-detection">Network Attack Detection</a>
+    </li>
+  
+    <li>
+      <span>February 28, 2007</span><a href="/will/2007/02/secure-programming">Secure Programming</a>
+    </li>
+  
+    <li>
+      <span>January 25, 2007</span><a href="/will/2007/01/scavenger">Scavenger </a>
+    </li>
+  
+  </ul>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

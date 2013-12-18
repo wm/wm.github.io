@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Sorted results with Hibernate</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/11/sorted-results-with-hibernate">Sorted results with Hibernate</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on November 27, 2007
+</div>
+  <p>So I have a need to get the results from my DB in a sorted list. Hibernate provides a number of ways to do this.</p>
+<p>I have implemented it in two ways</p>
+<p>I have an Object called Rounds that has a property List<Games>. So when I load in the Rounds object and want the List<Games> to be sorted I do it in the hbm.xml file as follows.</p>
+<div class="highlight"><pre><code class="xml"><span class="nt">&lt;hibernate-mapping&gt;</span>
+  <span class="nt">&lt;class</span> <span class="na">name=</span><span class="s">&quot;com.willspics.cs.epl.model.rounds.Rounds&quot;</span> <span class="na">table=</span><span class="s">&quot;rounds&quot;</span> <span class="na">catalog=</span><span class="s">&quot;epl&quot;</span> <span class="nt">&gt;</span>
+    <span class="nt">&lt;id</span> <span class="na">name=</span><span class="s">&quot;roundId&quot;</span> <span class="na">type=</span><span class="s">&quot;java.lang.Long&quot;</span> <span class="nt">&gt;</span>
+      <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">&quot;round_id&quot;</span>  <span class="nt">/&gt;</span>
+      <span class="nt">&lt;generator</span> <span class="na">class=</span><span class="s">&quot;native&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/id&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;deadline&quot;</span> <span class="na">type=</span><span class="s">&quot;java.util.Date&quot;</span> <span class="na">lazy=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">&quot;deadline&quot;</span> <span class="na">length=</span><span class="s">&quot;0&quot;</span> <span class="na">not-null=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;minimumPicks&quot;</span> <span class="na">type=</span><span class="s">&quot;java.lang.Long&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">&quot;minimum_picks&quot;</span> <span class="na">not-null=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;set</span> <span class="na">name=</span><span class="s">&quot;games&quot;</span> <span class="na">table=</span><span class="s">&quot;rounds_games&quot;</span> <span class="na">lazy=</span><span class="s">&quot;false&quot;</span> <span class="na">order-by=</span><span class="s">&quot;lower(game_id) asc&quot;</span> <span class="na">cascade=</span><span class="s">&quot;all,delete-orphan&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;key&gt;</span>
+        <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">&quot;round_id&quot;</span> <span class="na">not-null=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;/key&gt;</span>
+      <span class="nt">&lt;many-to-many</span> <span class="na">column=</span><span class="s">&quot;game_id&quot;</span> <span class="na">unique=</span><span class="s">&quot;true&quot;</span> <span class="na">class=</span><span class="s">&quot;com.willspics.cs.epl.model.games.Games&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/set&gt;</span>
+  <span class="nt">&lt;/class&gt;</span>
+<span class="nt">&lt;/hibernate-mapping&gt;</span>
+</code></pre>
+</div><p>The sorting is done by the order-by=&#8220;lower(game_id) asc&#8221;. Note that the <em>lower(game_id) asc</em> code is mysql specific and not hql.</p>
+<p>The second way is to just use <em>order by gameId</em> in the query with in the Java code.</p>
+<div class="highlight"><pre><code class="java">  <span class="n">String</span> <span class="n">queryString</span> <span class="o">=</span> <span class="s">&quot;from Games order by gameId&quot;</span><span class="o">;</span>
+  <span class="n">Query</span> <span class="n">queryObject</span> <span class="o">=</span> <span class="n">getSession</span><span class="o">().</span><span class="na">createQuery</span><span class="o">(</span><span class="n">queryString</span><span class="o">);</span>
+</code></pre>
+</div>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/11/sorted-results-with-hibernate';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

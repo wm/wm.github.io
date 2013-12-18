@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>SDA Project Proposal</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/09/sda-project-proposal">SDA Project Proposal</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on September 18, 2007
+</div>
+  <p><span class="caps">EPL</span> Weekly Pool (<span class="caps">EPL</span> English Premier League)</p>
+<p><strong>Purpose and the scope of the application</strong><br />
+The main goal of the application is to have a community of people that try to predict the results of games in the English Premier League (<span class="caps">EPL</span>).</p>
+<p>The application will allow users to join via a web interface. <br />
+Once joined a user will have to select 3 teams they think will win from the 10 games played each week in the <span class="caps">EPL</span>.</p>
+<p>If a user does not select 3 teams they will be deducted 5 points.</p>
+<p>When a user logs into the application the upcoming games will be displayed. There will be numbers assigned to each team like this&#8230;</p>
+<p>Everton (9) v. Man Utd (4)<br />
+Portsmouth (9.5) v. Liverpool (3.5)<br />
+Tottenham (7.5) v. Arsenal (5.5)<br />
+Birningham (6) v. Bolton (7)<br />
+West Ham (4.5) v. Middlesbrough (8.5)<br />
+Sunderland (5) v. Reading (8)<br />
+Wigan (5) v. Fulham (8)<br />
+Chelsea (2) v. Blackburn (9)<br />
+Man City (5) v. Aston Villa (8)<br />
+Derby (9) v. Newcastle (4)</p>
+<p>The sum of the numbers for each game will add to 13 (9+4, 9.5+3.5, etc.)<br />
+The numbers are generated form betting odds given by PaddyPower.com (A betting website). i.e. if Sunderland is expected to beat Reading then Sunderland will have a smaller number beside its name and Reading a larger one. The difference in the numbers depends on the odds.</p>
+<p>A user once logged in will select 3 teams (e.g. Sunderland, Derby and Chelsea). There will be a deadline as to when the users selection must be in. Once the deadline is reached the system will display every users selection and not allow more selections.</p>
+<p>Once the weekend games are over the system will calculate the users score.<br />
+Let us assume that Chelsea tied, Sunderland won and Derby lost. Then the user would get a score of 0 + 5 &#8211; 4 = 1</p>
+<p>0 for a tie <br />
+5 for a win because that was the number beside the winning team<br />
+-4 for a loss because that was the number beside the winning team.</p>
+<p>The competition will be divided up into quarters. So there will be a winner each quarter (Who ever has the most points) and an over all winner.</p>
+<p>There will also be a need for bonus rounds. These are sets of games that users can try to predict but will not loose 5 points if they do not enter.</p>
+<p>These bonus rounds arise because there are often games in mid-week that are separate to the 10 weekend games.</p>
+<p>The system will have to scaleable. Initially a user will be able to set up an account, create a league and invite other users. Then all users in that league will be playing against each other. There may also be a need to have an overall leader board from all the leagues.</p>
+<p>Initially the information will be inputted manually by the league administrator. This admin will enter the games with the numbers beside the teams and the deadline. The admin will then also have to enter the results of the games.</p>
+<p>When the system is updated by the admin an email will be generated and sent to the users. Also if a user has not entered the picks with one day left on the deadline then another email will be sent to that user.</p>
+<p><strong>Motivation</strong><br />
+My motivation is that I currently play this game with some friends but it is all done by email. And it would be nice to automate it. I also believe that it could be sold to a sports website to attract users to it (for advertising) or a betting site. Users may be more likely to gamble if they come to the same site each week.</p>
+<p><strong>Languages I will use</strong><br />
+I will write it in Java. I might do the <span class="caps">GUI</span> in <span class="caps">JSP</span> or <span class="caps">PHP</span>. More likely <span class="caps">JSP</span> because it will integrate easier with Java. The back end will be Java. And I will need a DB also. I might be able to do the math (adding the scores from the 3 games) in the DB also but not sure. I will write an administration <span class="caps">GUI</span> in <span class="caps">JSP</span> also. This <span class="caps">GUI</span> may be later replaced by an automated application that gets the information from the paddypower.com site.</p>
+<p><strong>Technologies I will use</strong><br />
+I will need to use TomCat for <span class="caps">JSP</span> and maybe some communication technology like <span class="caps">JMI</span> to interface between the <span class="caps">JSP</span> front end and the <span class="caps">JAVA</span> back end. I will need some sort of DB to store the user data and another for the games info. (Or maybe just one &#8211; I am thinking two because a sports company may already have one for the games. and this may help integration later)<br />
+I will need a server to host the back end and TomCat and <span class="caps">JMI</span>.</p>
+<p><strong>Design constraints</strong><br />
+Some constraints are-<br />
+The system must have users to operate<br />
+The users must be enrolled before the season starts<br />
+The users must select 3 teams per round (except bonus rounds)<br />
+The system will only be able to calculate the results after admin info is entered (winning tea,s etc.)<br />
+The system will store the results in a DB<br />
+The system will store the user selection is a DB<br />
+The system will calculate the score for each user based on what is in the DB. (This may be stored for increasing system speed)</p>
+<p><strong>Design Quality Conserns</strong><br />
+That the data entered is validated before entry to DB.<br />
+That there is an edit option for the Admin.<br />
+That the if the Admin edits any weeks results the scores will update accordingly</p>
+<p>That the system be scaleable (i.e. be able to be distributed later) &#8211; what if there are 1M users checking their scores on a Monday morning? Maybe the back end will span a new system that deals with just the league the user is in. That way it can cache relevant info in the app.</p>
+<p>Another one is reliability and redundancy. If the system shuts down badly will it be able to recover its state or at least a previous state? How will the <span class="caps">JSP</span> front end look if the Back End is down? How will it handle invalid data.</p>
+<p><strong>Other possible issues</strong><br />
+I have experience with Java/<span class="caps">PHP</span>/<span class="caps">JSP</span>/MySQL. My Java is strong <span class="caps">PHP</span> is good and <span class="caps">JSP</span> was 4 years ago. But if I remember it is pretty intuitive if I know Java and <span class="caps">PHP</span>. I am not so familiar with <span class="caps">JMI</span>. I have used it in applications but the infrastructure was already in place. And I am not even sure if I need it or can use it. Also setting up TomCat might be an issue. I will need a system to run it on. I think that one area that may slow me down is the DB design. How to design the tables and relationships in the DB. I have no real experience in this</p>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/09/sda-project-proposal';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

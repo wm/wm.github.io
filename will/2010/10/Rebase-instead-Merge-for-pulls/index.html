@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Using Rebase instead of Merge for pulls</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2010/10/Rebase-instead-Merge-for-pulls">Using Rebase instead of Merge for pulls</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on October 19, 2010
+</div>
+  <p>Instead of doing a regular pull</p>
+<div class='highlight'><pre><code class='bash'>     git <span class='nv'>pull</span> <span class='o'>=</span>&gt; git fetch <span class='o'>&amp;&amp;</span> git merge remotes/origin/BRANCH BRANCH
+</code></pre>
+</div>
+<p>To avoid the all the merge commit messages you can run the following command instead</p>
+<div class='highlight'><pre><code class='bash'>     git pull --rebase <span class='o'>=</span>&gt; git fetch <span class='o'>&amp;&amp;</span> git rebase remotes/origin/BRANCH BRANCH
+</code></pre>
+</div>
+<p>I actually have the following in my ~/.gitconfig file</p>
+<div class='highlight'><pre><code class='bash'>    <span class='o'>[</span><span class='nb'>alias</span><span class='o'>]</span>
+        <span class='nv'>up</span> <span class='o'>=</span> !sh -c <span class='s1'>&#39;git pull --rebase --prune &amp;&amp; git log --pretty=format:\&quot;%Cred%ae %Creset- %C(yellow)%s %Creset(%ar)\&quot; HEAD@{1}..&#39;</span>
+</code></pre>
+</div>
+<p>So when I run &#8216;git up&#8217; it does a pull and prints out a concisely what was pulled. I got it from <a href='http://github.com/kneath'>Kyle Neath</a>&#8217;s <a href='http://gist.github.com/249223' title='Badass git pull alternative'>gist</a></p>
+
+<h2 id='difference_between_rebase_and_a_merge'>Difference between rebase and a merge</h2>
+
+<h3 id='simple_answer'>Simple answer</h3>
+<div class='highlight'><pre><code class='bash'>git pull
+  does a merge of your master and the remotes/origin/master and creates
+  a commit to capture the merge.
+git pull --rebase 
+  stashes your unpushed commits from master, fast-forwards the upstream 
+  changes from remotes/origin/master and <span class='k'>then </span>replays your stashed 
+  commits.
+</code></pre>
+</div>
+<h3 id='verbose_answer'>Verbose answer</h3>
+
+<p>GIT PULL (merge)</p>
+<div class='highlight'><pre><code class='bash'>Assume the following <span class='nb'>history </span>exists and the current branch is <span class='s2'>&quot;master&quot;</span>:
+
+           A---B---C master on origin
+          /
+     D---E---F---G master
+ Then <span class='s2'>&quot;git pull&quot;</span> will fetch and replay the changes from the remote
+ master branch since it diverged from the <span class='nb'>local </span>master <span class='o'>(</span>i.e., E<span class='o'>)</span> <span class='k'>until</span>
+<span class='k'> </span>its current commit <span class='o'>(</span>C<span class='o'>)</span> on top of master and record the result in a new
+ commit along with the names of the two parent commits and a log message
+ from the user describing the changes.
+
+           A---B---C remotes/origin/master
+          /         <span class='se'>\</span>
+     D---E---F---G---H master
+</code></pre>
+</div>
+<p>GIT PULL (rebase)</p>
+<div class='highlight'><pre><code class='bash'>Assume the following <span class='nb'>history </span>exists and the current branch is <span class='s2'>&quot;topic&quot;</span>:
+
+             A---B---C master
+            /
+       D---E---F---G master on origin
+
+   Then <span class='s2'>&quot;git pull --rebase&quot;</span> will fetch, stash <span class='nb'>local </span>commits <span class='o'>(</span>A, B, C<span class='o'>)</span>, 
+   fast-forward, and replay
+   your stashed commits on top of master <span class='o'>(</span>as A<span class='s1'>&#39;, B&#39;</span>, C<span class='s1'>&#39;) including </span>
+<span class='s1'>   recreating the commit messages.</span>
+
+<span class='s1'>                     A&#39;</span>--B<span class='s1'>&#39;--C&#39;</span> master
+                    /
+       D---E---F---G master on origin
+</code></pre>
+</div>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2010/10/Rebase-instead-Merge-for-pulls';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>

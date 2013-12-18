@@ -1,0 +1,1482 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Algorithms Project</title>
+   <meta name="author" content="Will Mernagh" />
+   <link rel="alternate" type="application/rss+xml" href="http://feeds.feedburner.com/wmernagh" />
+   <link rel="stylesheet" href="/css/styles.css" type="text/css" media="screen, projection" />
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+   <script type="text/javascript" src="/javascript/jquery.boastful.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function() {
+        $('#boastful').boastful()
+     });
+   </script>
+</head>
+<body>
+	
+	<div id="header">
+	  <a href="/">
+	    <img src="http://en.gravatar.com/userimage/944395/c4f6f5602305ebe2cac41ddfc165782d.png" height="48" width="48" class="avatar" />
+	  </a>
+	  <div id="bio">
+	    <div id="title"><a href="/will">Will Mernagh</a></div>
+	    <div class="byline separation">
+	      I work at <a href="http://iorahealth.com">Iora Health</a>.<br />
+	      I am a <a href="http://www.cs.tufts.edu">Tufts</a> and
+	      <a href="http://www.cit.ie">CIT</a> Alum.<br />
+	    </div>
+	    <div class="byline separation">
+	      I'm <a href="http://twitter.com/im_a_muppet">@im_a_muppet</a> on Twitter.<br />
+	      I'm <a href="http://github.com/wmernagh">@wmernagh</a> on GitHub.<br />
+          <br/>
+	      Will and Orla's <a href="/photos/">photo</a> page<br />
+	      Back to <a href="/">WillAndOrla.com</a><br />
+	    </div>
+    <div class="byline contact">
+      <a href="/will/about">about</a>
+      <a
+      href="mailto:&#119;&#109;&#101;&#114;&#110;&#097;&#103;&#104;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">contact</a>
+      <a href="https://github.com/wmernagh/blog">fork</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="post">
+  <h1>
+  <a href="/2007/04/algorithms-project">Algorithms Project</a>
+</h1>
+<div class="authoring">
+  by @<a href="http://twitter.com/im_a_muppet">im_a_muppet</a> on April 22, 2007
+</div>
+  <p>For this assignment we have to write a dictionary file using two different data types. The first dictionary will implement a Link List and the second Red Black Trees. We will then compare the performance of each.</p>
+<p>The program will get two files and populate the dictionary form one file and see which words in the second file are then in the dictionary.</p>
+<p><a href="/cs/project.pdf" title="Dictonary Projest">Dictionary Project</a> assignment description</p>
+<p>Solution:</p>
+<p><a href="/cs/nodes.h" title="pa4.c">nodes.h</a></p>
+<div class="highlight"><pre><code class="cpp"><span class="cm">/*</span>
+<span class="cm"> *  File:    nodes.h</span>
+<span class="cm"> *  Prj:    Dictonary</span>
+<span class="cm"> *</span>
+<span class="cm"> *  Created by Will Mernagh on April 21.</span>
+<span class="cm"> *  Copyright 2007. All rights reserved.</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="cp">#ifndef NODES</span>
+<span class="cp">#define NODES</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">node</span><span class="p">{</span>
+    <span class="n">string</span> <span class="n">word</span><span class="p">;</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">link</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * TreeNode</span>
+<span class="cm"> *</span>
+<span class="cm"> * This is a class representing a node in a Binary Search Tree</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="k">class</span> <span class="nc">TreeNode</span> <span class="p">{</span>
+
+<span class="k">protected</span><span class="o">:</span>
+<span class="c1">//public:</span>
+    <span class="n">TreeNode</span> <span class="o">*</span><span class="n">left</span><span class="p">;</span>    <span class="c1">// Pointer to left subtree.</span>
+    <span class="n">TreeNode</span> <span class="o">*</span><span class="n">right</span><span class="p">;</span>
+    <span class="n">TreeNode</span> <span class="o">*</span><span class="n">parent</span><span class="p">;</span>  
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">string</span> <span class="n">word</span><span class="p">;</span>       <span class="c1">// The data in this node.</span>
+    <span class="n">TreeNode</span> <span class="o">*</span> <span class="n">getParent</span><span class="p">();</span>
+    <span class="n">TreeNode</span> <span class="o">*</span> <span class="n">getRight</span><span class="p">();</span>
+    <span class="n">TreeNode</span> <span class="o">*</span> <span class="n">getLeft</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="n">setParent</span><span class="p">(</span><span class="n">TreeNode</span> <span class="o">*</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="n">setLeft</span><span class="p">(</span><span class="n">TreeNode</span> <span class="o">*</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="n">setRight</span><span class="p">(</span><span class="n">TreeNode</span> <span class="o">*</span><span class="p">);</span>
+
+<span class="p">};</span> 
+
+<span class="cm">/*</span>
+<span class="cm"> * RBTreeNode</span>
+<span class="cm"> *</span>
+<span class="cm"> * This is a class representing a node in a Red Black Tree</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="k">class</span> <span class="nc">RBTreeNode</span> <span class="o">:</span> <span class="k">public</span> <span class="n">TreeNode</span>
+<span class="p">{</span>
+<span class="k">private</span><span class="o">:</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="kt">int</span> <span class="n">color</span><span class="p">;</span>
+    <span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">getParent</span><span class="p">();</span>
+    <span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">getRight</span><span class="p">();</span>
+    <span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">getLeft</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="n">setParent</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="n">setLeft</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="n">setRight</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="p">);</span>
+<span class="p">};</span> 
+
+<span class="cp">#endif</span>
+</code></pre>
+</div><p><a href="/cs/nodes.cpp" title="pa4.c">nodes.cpp</a></p>
+<div class="highlight"><pre><code class="cpp"><span class="cm">/*</span>
+<span class="cm"> *  File:    nodes.cpp</span>
+<span class="cm"> *  Prj:    dictionary</span>
+<span class="cm"> *</span>
+<span class="cm"> *  Created by Will Mernagh on April/26.</span>
+<span class="cm"> *  Copyright 2007. All rights reserved.</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+
+<span class="cp">#include &quot;nodes.h&quot;</span>
+
+<span class="n">TreeNode</span> <span class="o">*</span> <span class="n">TreeNode</span><span class="o">::</span><span class="n">getParent</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="n">parent</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">TreeNode</span> <span class="o">*</span> <span class="n">TreeNode</span><span class="o">::</span><span class="n">getRight</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="n">right</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">TreeNode</span> <span class="o">*</span> <span class="n">TreeNode</span><span class="o">::</span><span class="n">getLeft</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="n">left</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">TreeNode</span><span class="o">::</span><span class="n">setParent</span><span class="p">(</span><span class="n">TreeNode</span> <span class="o">*</span><span class="n">nodein</span><span class="p">){</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">nodein</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">TreeNode</span><span class="o">::</span><span class="n">setLeft</span><span class="p">(</span><span class="n">TreeNode</span> <span class="o">*</span><span class="n">nodein</span><span class="p">){</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="n">nodein</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="n">TreeNode</span><span class="o">::</span><span class="n">setRight</span><span class="p">(</span><span class="n">TreeNode</span> <span class="o">*</span><span class="n">nodein</span><span class="p">){</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="n">nodein</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">RBTreeNode</span><span class="o">::</span><span class="n">getParent</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">RBTreeNode</span> <span class="o">*&gt;</span><span class="p">(</span><span class="n">parent</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">RBTreeNode</span><span class="o">::</span><span class="n">getRight</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">RBTreeNode</span> <span class="o">*&gt;</span><span class="p">(</span><span class="n">right</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">RBTreeNode</span><span class="o">::</span><span class="n">getLeft</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">RBTreeNode</span> <span class="o">*&gt;</span><span class="p">(</span><span class="n">left</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">RBTreeNode</span><span class="o">::</span><span class="n">setParent</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">nodein</span><span class="p">){</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">nodein</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">RBTreeNode</span><span class="o">::</span><span class="n">setLeft</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">nodein</span><span class="p">){</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="n">nodein</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="n">RBTreeNode</span><span class="o">::</span><span class="n">setRight</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">nodein</span><span class="p">){</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="n">nodein</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div><p><a href="/cs/linklist.h" title="pa4.c">linklist.h</a></p>
+<div class="highlight"><pre><code class="ruby"><span class="sr">/*</span>
+<span class="sr"> *  File:    linklist.h</span>
+<span class="sr"> *  Prj:    Dictonary</span>
+<span class="sr"> *</span>
+<span class="sr"> *  Created by Will Mernagh on April 21.</span>
+<span class="sr"> *  Copyright 2007. All rights reserved.</span>
+<span class="sr"> *</span>
+<span class="sr"> */</span>
+<span class="c1">#ifndef LINKLIST</span>
+<span class="c1">#define LINKLIST</span>
+<span class="c1">#include &lt;iostream&gt;</span>
+<span class="c1">#include &quot;nodes.h&quot;</span>
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">std</span><span class="p">;</span><span class="sr"></span>
+
+<span class="sr">/*</span>
+<span class="sr"> * linklist</span>
+<span class="sr"> *</span>
+<span class="sr"> * Class defination of linklist.</span>
+<span class="sr"> *</span>
+<span class="sr"> * This class represents a linklist data structure </span>
+<span class="sr"> * where the data is to be  stored in a node</span>
+<span class="sr"> *</span>
+<span class="sr"> * @see nodes.h</span>
+<span class="sr"> *</span>
+<span class="sr"> */</span>
+<span class="k">class</span> <span class="n">linklist</span>
+<span class="p">{</span>
+<span class="kp">private</span><span class="p">:</span>
+
+    <span class="n">node</span> <span class="o">*</span><span class="nb">p</span><span class="p">,</span> <span class="o">*</span><span class="n">ptail</span><span class="p">;</span>
+
+<span class="kp">public</span><span class="p">:</span>
+
+    <span class="n">linklist</span><span class="p">();</span>
+
+    <span class="n">void</span> <span class="nb">display</span><span class="p">();</span>
+    <span class="n">int</span> <span class="n">count</span><span class="p">();</span>
+    <span class="n">void</span> <span class="n">append</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+    <span class="n">void</span> <span class="n">add_as_first</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+    <span class="n">void</span> <span class="n">addafter</span><span class="p">(</span><span class="n">int</span><span class="p">,</span> <span class="n">string</span><span class="p">);</span>
+    <span class="n">bool</span> <span class="n">del</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+    <span class="n">node</span> <span class="o">*</span> <span class="n">head</span><span class="p">();</span>
+    <span class="n">node</span> <span class="o">*</span> <span class="n">tail</span><span class="p">();</span>
+    <span class="o">~</span><span class="n">linklist</span><span class="p">();</span>
+<span class="p">};</span>
+<span class="c1">#endif</span>
+</code></pre>
+</div><p><a href="/cs/linklist.cpp" title="pa4.c">linklist.cpp</a></p>
+<div class="highlight"><pre><code class="cpp"><span class="cm">/*</span>
+<span class="cm"> *  File:    linklist.cpp</span>
+<span class="cm"> *  Prj:    Dictonary</span>
+<span class="cm"> *</span>
+<span class="cm"> *  Created by Will Mernagh on April 21.</span>
+<span class="cm"> *  Copyright 2007. All rights reserved.</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &quot;linklist.h&quot;</span>
+<span class="cp">#include &quot;nodes.h&quot;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+
+<span class="cm">/*</span>
+<span class="cm"> * linklist() constructor</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="n">linklist</span><span class="o">::</span><span class="n">linklist</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">p</span><span class="o">=</span><span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * head()</span>
+<span class="cm"> * </span>
+<span class="cm"> * @return    the head of the link list</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="n">node</span> <span class="o">*</span> <span class="n">linklist</span><span class="o">::</span><span class="n">head</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">p</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * tail()</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return    the tail of the linklist</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="n">node</span> <span class="o">*</span> <span class="n">linklist</span><span class="o">::</span><span class="n">tail</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">p</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="k">return</span> <span class="n">ptail</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * append()</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    string - the data to encapsulate in a node.</span>
+<span class="cm"> *</span>
+<span class="cm"> * The function creates a node and encapsulates the </span>
+<span class="cm"> * string in it. It then appends the node to the tail </span>
+<span class="cm"> * of the linklist.</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">linklist</span><span class="o">::</span><span class="n">append</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">q</span><span class="p">,</span><span class="o">*</span><span class="n">t</span><span class="p">;</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="n">p</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="n">node</span><span class="p">;</span>
+        <span class="n">p</span><span class="o">-&gt;</span><span class="n">word</span> <span class="o">=</span> <span class="n">word</span><span class="p">;</span>
+        <span class="n">p</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">ptail</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+
+        <span class="c1">//find end of list</span>
+        <span class="k">while</span><span class="p">(</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="p">)</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span>
+
+        <span class="n">t</span> <span class="o">=</span> <span class="k">new</span> <span class="n">node</span><span class="p">;</span>
+        <span class="n">t</span><span class="o">-&gt;</span><span class="n">word</span> <span class="o">=</span> <span class="n">word</span><span class="p">;</span>
+        <span class="n">t</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">=</span> <span class="n">t</span><span class="p">;</span>
+        <span class="n">ptail</span> <span class="o">=</span> <span class="n">t</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * add_as_first()</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    string - the data to encapsulate in a node.</span>
+<span class="cm"> *</span>
+<span class="cm"> * The function creates a node and encapsulates the string </span>
+<span class="cm"> * in it. It then adds the node to the head of the </span>
+<span class="cm"> * linklist.</span>
+<span class="cm"> *</span>
+<span class="cm"> * This is faster than append() since there is not search </span>
+<span class="cm"> * for tail</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">linklist</span><span class="o">::</span><span class="n">add_as_first</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="k">new</span> <span class="n">node</span><span class="p">;</span>
+    <span class="n">q</span><span class="o">-&gt;</span><span class="n">word</span> <span class="o">=</span> <span class="n">word</span><span class="p">;</span>
+    <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * addafter()</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    string    - the data to encapsulate in a node.</span>
+<span class="cm"> * @param    int        - the position to place node -1</span>
+<span class="cm"> *</span>
+<span class="cm"> * The function creates a node and encapsulates the string </span>
+<span class="cm"> * in it. It then adds the node after the c-th node of the</span>
+<span class="cm"> * linklist.</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">linklist</span><span class="o">::</span><span class="n">addafter</span><span class="p">(</span> <span class="kt">int</span> <span class="n">c</span><span class="p">,</span> <span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">q</span><span class="p">,</span><span class="o">*</span><span class="n">t</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">q</span><span class="o">=</span><span class="n">p</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">c</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">q</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+        <span class="p">{</span>
+           <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">There are less than &quot;</span><span class="o">&lt;&lt;</span> <span class="n">c</span> <span class="o">&lt;&lt;</span><span class="s">&quot; elements.&quot;</span><span class="p">;</span>
+           <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+
+    <span class="n">t</span> <span class="o">=</span> <span class="k">new</span> <span class="n">node</span><span class="p">;</span>
+    <span class="n">t</span><span class="o">-&gt;</span><span class="n">word</span> <span class="o">=</span> <span class="n">word</span><span class="p">;</span>
+    <span class="n">t</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span>
+    <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">=</span> <span class="n">t</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">ptail</span> <span class="o">=</span> <span class="n">t</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * del()</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    string    - the data encapsulated in the node to be deleted.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return    bool    - true if the encapsulated node existed in list.</span>
+<span class="cm"> *</span>
+<span class="cm"> * The function finds the node that encapsulates the string and removes </span>
+<span class="cm"> * it from the linked list</span>
+<span class="cm"> */</span>
+<span class="kt">bool</span> <span class="n">linklist</span><span class="o">::</span><span class="n">del</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">q</span><span class="p">,</span><span class="o">*</span><span class="n">r</span><span class="p">;</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">word</span> <span class="o">==</span> <span class="n">word</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span>
+        <span class="k">delete</span> <span class="n">q</span><span class="p">;</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+    <span class="k">while</span><span class="p">(</span> <span class="n">q</span><span class="o">!=</span><span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">word</span> <span class="o">==</span> <span class="n">word</span> <span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">r</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span>
+            <span class="k">delete</span> <span class="n">q</span><span class="p">;</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">r</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+                <span class="n">ptail</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * display()</span>
+<span class="cm"> *</span>
+<span class="cm"> * Display the data encapsulated in the nodes of the linklist</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">linklist</span><span class="o">::</span><span class="n">display</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
+
+    <span class="k">for</span><span class="p">(</span> <span class="n">q</span> <span class="o">=</span> <span class="n">p</span> <span class="p">;</span> <span class="n">q</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="p">;</span> <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span> <span class="p">){</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">word: &quot;</span><span class="o">&lt;&lt;</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">;</span>
+    <span class="p">}</span>
+
+
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * count()</span>
+<span class="cm"> *</span>
+<span class="cm"> * Counts the number of nodes in the list.</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">linklist</span><span class="o">::</span><span class="n">count</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span> <span class="n">q</span><span class="o">=</span><span class="n">p</span> <span class="p">;</span> <span class="n">q</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="p">;</span> <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span> <span class="p">)</span>
+        <span class="n">c</span><span class="o">++</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">c</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * ~linklist()    destructor</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="n">linklist</span><span class="o">::~</span><span class="n">linklist</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">p</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">;</span>
+
+    <span class="k">while</span><span class="p">(</span> <span class="n">p</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span>
+        <span class="k">delete</span> <span class="n">p</span><span class="p">;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div><p><a href="/cs/BinarySearchTree.h" title="pa4.c">BinarySearchTree.h</a></p>
+<div class="highlight"><pre><code class="cpp"><span class="cm">/*</span>
+<span class="cm"> *  File:    BinarySearchTree.h</span>
+<span class="cm"> *  Prj:    Dictonary</span>
+<span class="cm"> *</span>
+<span class="cm"> *  Created by Will Mernagh on April 21.</span>
+<span class="cm"> *  Copyright 2007. All rights reserved.</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="cp">#ifndef BSTREE</span>
+<span class="cp">#define BSTREE</span>
+<span class="cp">#include &quot;nodes.h&quot;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * BST</span>
+<span class="cm"> *</span>
+<span class="cm"> * Class defination of a Binary Search Tree.</span>
+<span class="cm"> *</span>
+<span class="cm"> * This class represents a Binary Search Tree data structure where </span>
+<span class="cm"> * the data is to be stored in a node.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @see    nodes.h</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="k">class</span> <span class="nc">BST</span>
+<span class="p">{</span>
+<span class="k">protected</span><span class="o">:</span>
+    <span class="n">TreeNode</span> <span class="o">*</span><span class="n">root</span><span class="p">;</span>
+    <span class="kt">void</span>  <span class="n">recurseDisplay</span><span class="p">(</span><span class="n">TreeNode</span> <span class="o">*</span><span class="p">);</span>
+    <span class="n">TreeNode</span> <span class="o">*</span> <span class="n">findNode</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+    <span class="kt">bool</span> <span class="n">insert</span><span class="p">(</span><span class="n">TreeNode</span> <span class="o">*</span><span class="p">);</span>
+
+<span class="k">public</span><span class="o">:</span>
+        <span class="n">BST</span><span class="p">();</span>
+        <span class="kt">bool</span> <span class="n">insert</span><span class="p">(</span><span class="n">string</span><span class="p">);</span> 
+        <span class="kt">void</span> <span class="n">display</span><span class="p">();</span> 
+        <span class="kt">bool</span> <span class="n">del</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+        <span class="n">TreeNode</span> <span class="o">*</span> <span class="n">successor</span><span class="p">(</span><span class="n">string</span><span class="p">);</span> 
+        <span class="kt">bool</span> <span class="n">find</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+        <span class="n">TreeNode</span> <span class="o">*</span> <span class="n">getRoot</span><span class="p">();</span>
+        <span class="kt">void</span> <span class="n">setRoot</span><span class="p">(</span><span class="n">TreeNode</span> <span class="o">*</span><span class="p">);</span>
+        <span class="o">~</span><span class="n">BST</span><span class="p">();</span>
+<span class="p">};</span>
+<span class="cp">#endif</span>
+</code></pre>
+</div><p><a href="/cs/BinarySearchTree.cpp" title="pa4.c">BinsrySearchTree.cpp</a><br />
+<script src="https://gist.github.com/777901.js?file=BinsrySearchTree.cpp"></script></p>
+<p><a href="/cs/RedBlackTree.h" title="pa4.c">RedBlackTree.h</a></p>
+<div class="highlight"><pre><code class="cpp"><span class="cm">/*</span>
+<span class="cm"> *  File:    RedBlackTree.h</span>
+<span class="cm"> *  Prj:    Dictonary</span>
+<span class="cm"> *</span>
+<span class="cm"> *  Created by Will Mernagh on April 21.</span>
+<span class="cm"> *  Copyright 2007. All rights reserved.</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="cp">#ifndef RBTREE</span>
+<span class="cp">#define RBTREE</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &quot;nodes.h&quot;</span>
+<span class="cp">#include &quot;BinarySearchTree.h&quot;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * RedBlackTree</span>
+<span class="cm"> *</span>
+<span class="cm"> * Class defination of RedBlackTree.</span>
+<span class="cm"> *</span>
+<span class="cm"> * This class represents a Red Black Tree data structure </span>
+<span class="cm"> * where the data is to be stored in a node. It is </span>
+<span class="cm"> * extended from BinarySearchTree.h</span>
+<span class="cm"> *</span>
+<span class="cm"> * @see BinarySearchTree.h, nodes.h</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="k">class</span> <span class="nc">RedBlackTree</span> <span class="o">:</span> <span class="k">protected</span> <span class="n">BST</span>
+<span class="p">{</span>
+<span class="k">private</span><span class="o">:</span>
+    <span class="c1">//RBTreeNode *root;</span>
+    <span class="kt">bool</span> <span class="n">rotateLeft</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="p">);</span>
+    <span class="kt">bool</span> <span class="n">rotateRight</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="p">);</span>
+    <span class="kt">bool</span> <span class="n">insertFix</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="p">);</span>
+    <span class="kt">bool</span> <span class="n">delFix</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="n">recurseDisplay</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="p">);</span>
+    <span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">findNode</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">RedBlackTree</span><span class="p">();</span>
+    <span class="kt">bool</span> <span class="n">insert</span><span class="p">(</span><span class="n">string</span><span class="p">);</span> 
+    <span class="kt">void</span> <span class="n">display</span><span class="p">();</span> 
+    <span class="kt">bool</span> <span class="n">del</span><span class="p">(</span><span class="n">string</span><span class="p">);</span> 
+    <span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">successor</span><span class="p">(</span><span class="n">string</span><span class="p">);</span> 
+    <span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">getRoot</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="n">setRoot</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="p">);</span>
+    <span class="o">~</span><span class="n">RedBlackTree</span><span class="p">();</span>
+<span class="p">};</span>
+<span class="cp">#endif</span>
+</code></pre>
+</div><p><a href="/cs/RedBlackTree.cpp" title="pa4.c">RedBlackTree.cpp</a></p>
+<div class="highlight"><pre><code class="cpp"><span class="cm">/*</span>
+<span class="cm"> *  RedBlackTree.cpp</span>
+<span class="cm"> *  dictionary</span>
+<span class="cm"> *</span>
+<span class="cm"> *  Created by Will Mernagh on April/21.</span>
+<span class="cm"> *  Copyright 2007. All rights reserved.</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &quot;RedBlackTree.h&quot;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="cp">#define RED 1</span>
+<span class="cp">#define BLACK 2</span>
+
+
+<span class="cm">/*</span>
+<span class="cm"> * Constructor</span>
+<span class="cm"> */</span>
+<span class="n">RedBlackTree</span><span class="o">::</span><span class="n">RedBlackTree</span><span class="p">(){</span>
+    <span class="n">setRoot</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Destructor</span>
+<span class="cm"> */</span>
+<span class="n">RedBlackTree</span><span class="o">::~</span><span class="n">RedBlackTree</span><span class="p">(){</span>
+
+
+    <span class="k">while</span><span class="p">(</span><span class="n">getRoot</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">del</span><span class="p">(</span><span class="n">getRoot</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * get the root</span>
+<span class="cm"> */</span>
+<span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">getRoot</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">RBTreeNode</span> <span class="o">*&gt;</span><span class="p">(</span><span class="n">BST</span><span class="o">::</span><span class="n">getRoot</span><span class="p">());</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * set the root</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">setRoot</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">rootin</span><span class="p">){</span>
+    <span class="n">BST</span><span class="o">::</span><span class="n">setRoot</span><span class="p">(</span><span class="n">rootin</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">/* </span>
+<span class="cm"> * Inserts the string into the tree. </span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    String        The string to add to the tree</span>
+<span class="cm"> * @return    False        if already in the tree</span>
+<span class="cm"> */</span>
+<span class="kt">bool</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">insert</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">){</span>
+
+    <span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">rbnode</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RBTreeNode</span><span class="p">;</span>
+
+    <span class="n">rbnode</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">RED</span><span class="p">;</span>
+    <span class="n">rbnode</span><span class="o">-&gt;</span><span class="n">word</span> <span class="o">=</span> <span class="n">word</span><span class="p">;</span>
+    <span class="n">rbnode</span><span class="o">-&gt;</span><span class="n">setLeft</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">rbnode</span><span class="o">-&gt;</span><span class="n">setRight</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">BST</span><span class="o">::</span><span class="n">insert</span><span class="p">(</span><span class="n">rbnode</span><span class="p">)){</span>
+        <span class="n">insertFix</span><span class="p">(</span><span class="n">rbnode</span><span class="p">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="k">delete</span> <span class="n">rbnode</span><span class="p">;</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+
+<span class="cm">/* </span>
+<span class="cm"> * Display the items in a tree in order and with color</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    RBTreeNode    The next node to recurse on</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">recurseDisplay</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">node</span><span class="p">){</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">node</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">recurseDisplay</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">());</span>
+        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">word</span><span class="o">&lt;&lt;</span><span class="s">&quot;&quot;</span><span class="p">;</span>
+        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot; [&quot;</span><span class="p">;</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">RED</span><span class="p">){</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;RED&quot;</span><span class="p">;}</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">BLACK</span><span class="p">){</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;BLACK&quot;</span><span class="p">;}</span>
+        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;] &quot;</span><span class="p">;</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+            <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;(&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">word</span><span class="o">&lt;&lt;</span><span class="s">&quot;)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+            <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">recurseDisplay</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">());</span>
+
+    <span class="p">}</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* </span>
+<span class="cm"> * Display the items in a tree in order</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="kt">void</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">display</span><span class="p">(){</span>
+
+    <span class="n">recurseDisplay</span><span class="p">(</span><span class="n">getRoot</span><span class="p">());</span>
+
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* Delete a word from the tree</span>
+<span class="cm"> * </span>
+<span class="cm"> * @param    string    The string to delete</span>
+<span class="cm"> * @return    bool    False if it does not exist in tree</span>
+<span class="cm"> */</span>
+<span class="kt">bool</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">del</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">){</span>
+
+    <span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="n">z</span><span class="p">;</span>
+
+    <span class="n">z</span> <span class="o">=</span> <span class="n">findNode</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">z</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span><span class="p">((</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)){</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">z</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">successor</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span><span class="p">((</span><span class="n">y</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">y</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)){</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">y</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">();</span>
+    <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">y</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">y</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span><span class="p">((</span><span class="n">y</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">y</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">BLACK</span><span class="p">)){</span>
+
+        <span class="n">delFix</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">BST</span><span class="o">::</span><span class="n">del</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">/* </span>
+<span class="cm"> * Search for the successor of a string and return it if in tree</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    String        The string whose successor to search for</span>
+<span class="cm"> * @return    RBTreeNode    if string in the tree else return null</span>
+<span class="cm"> */</span>
+<span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">successor</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">){</span>
+    <span class="n">TreeNode</span> <span class="o">*</span><span class="n">tnode</span><span class="p">;</span>
+    <span class="n">tnode</span> <span class="o">=</span> <span class="n">BST</span><span class="o">::</span><span class="n">successor</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">RBTreeNode</span> <span class="o">*&gt;</span><span class="p">(</span><span class="n">tnode</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">bool</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">rotateLeft</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">node_x</span><span class="p">){</span>
+
+    <span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">node_y</span><span class="p">;</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">node_x</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">node_y</span> <span class="o">=</span> <span class="n">node_x</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">();</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">node_y</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">node_y</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setParent</span><span class="p">(</span><span class="n">node_x</span><span class="p">);</span>
+        <span class="n">node_x</span><span class="o">-&gt;</span><span class="n">setRight</span><span class="p">(</span><span class="n">node_y</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="n">node_y</span><span class="o">-&gt;</span><span class="n">setParent</span><span class="p">(</span><span class="n">node_x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">());</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">node_x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">setRoot</span><span class="p">(</span><span class="n">node_y</span><span class="p">);</span>
+    <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">node_x</span> <span class="o">==</span> <span class="n">node_x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()){</span>
+        <span class="n">node_x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setLeft</span><span class="p">(</span><span class="n">node_y</span><span class="p">);</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="n">node_x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setRight</span><span class="p">(</span><span class="n">node_y</span><span class="p">);</span>
+    <span class="p">}</span>
+     
+    <span class="n">node_x</span><span class="o">-&gt;</span><span class="n">setRight</span><span class="p">(</span><span class="n">node_y</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">());</span>
+    <span class="n">node_y</span><span class="o">-&gt;</span><span class="n">setLeft</span><span class="p">(</span><span class="n">node_x</span><span class="p">);</span>
+    <span class="n">node_x</span><span class="o">-&gt;</span><span class="n">setParent</span><span class="p">(</span><span class="n">node_y</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* </span>
+<span class="cm"> * Rotate the tree right on y</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    RBTreeNode    The node to rotate on</span>
+<span class="cm"> * @return    False        if node to ret on deos not exist</span>
+<span class="cm"> */</span>
+<span class="kt">bool</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">rotateRight</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">node_y</span><span class="p">){</span>
+
+    <span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">node_x</span><span class="p">;</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">node_y</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">node_x</span> <span class="o">=</span> <span class="n">node_y</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">();</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">node_x</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">node_x</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setParent</span><span class="p">(</span><span class="n">node_y</span><span class="p">);</span>
+        <span class="n">node_y</span><span class="o">-&gt;</span><span class="n">setLeft</span><span class="p">(</span><span class="n">node_x</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="n">node_x</span><span class="o">-&gt;</span><span class="n">setParent</span><span class="p">(</span><span class="n">node_y</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">());</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">node_y</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">setRoot</span><span class="p">(</span><span class="n">node_x</span><span class="p">);</span>
+    <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">node_y</span> <span class="o">==</span> <span class="n">node_y</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()){</span>
+        <span class="n">node_y</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setLeft</span><span class="p">(</span><span class="n">node_x</span><span class="p">);</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="n">node_y</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">setRight</span><span class="p">(</span><span class="n">node_x</span><span class="p">);</span>
+    <span class="p">}</span>
+     
+    <span class="n">node_y</span><span class="o">-&gt;</span><span class="n">setLeft</span><span class="p">(</span><span class="n">node_x</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">());</span>
+    <span class="n">node_x</span><span class="o">-&gt;</span><span class="n">setRight</span><span class="p">(</span><span class="n">node_y</span><span class="p">);</span>
+    <span class="n">node_y</span><span class="o">-&gt;</span><span class="n">setParent</span><span class="p">(</span><span class="n">node_x</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* </span>
+<span class="cm"> * Maintains the red black tree properties after a node is deleted</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    RBTreeNode    The node that is in violation</span>
+<span class="cm"> * @return    true        always</span>
+<span class="cm"> */</span>
+<span class="kt">bool</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">delFix</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">nodein</span><span class="p">){</span>
+
+    <span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">w</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">nodein</span><span class="p">;</span>
+
+    <span class="k">while</span><span class="p">(</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">getRoot</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">x</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">BLACK</span><span class="p">){</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span> <span class="o">==</span> <span class="n">x</span><span class="p">){</span>
+    
+            <span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">();</span>
+
+
+            <span class="k">if</span><span class="p">(</span><span class="n">w</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">w</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">RED</span><span class="p">){</span>
+                <span class="n">w</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+                <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">RED</span><span class="p">;</span>
+                <span class="n">rotateLeft</span><span class="p">(</span><span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">());</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">();</span>
+            <span class="p">}</span>
+    
+            <span class="k">if</span><span class="p">((</span><span class="n">w</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">w</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> 
+                    <span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">BLACK</span><span class="p">)</span> <span class="o">&amp;&amp;</span> 
+                    <span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">w</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">BLACK</span><span class="p">)){</span>
+        
+                <span class="n">w</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">RED</span><span class="p">;</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">();</span>
+        
+            <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">w</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">w</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">BLACK</span><span class="p">){</span>
+        
+                <span class="n">w</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+                <span class="n">w</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">RED</span><span class="p">;</span>
+                <span class="n">rotateRight</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">();</span>
+            <span class="p">}</span>
+    
+            <span class="k">if</span><span class="p">((</span><span class="n">w</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)){</span>
+                <span class="n">w</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span><span class="p">;</span>
+            <span class="p">}</span>
+    
+            <span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+                <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+            <span class="p">}</span>
+    
+            <span class="k">if</span><span class="p">(</span><span class="n">w</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">w</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+                <span class="n">w</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+            <span class="p">}</span>
+    
+            <span class="n">rotateLeft</span><span class="p">(</span><span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">());</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">getRoot</span><span class="p">();</span>
+
+        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+    
+            <span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">();</span>
+
+            <span class="k">if</span><span class="p">((</span><span class="n">w</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">RED</span><span class="p">)){</span>
+                <span class="n">w</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+                <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">RED</span><span class="p">;</span>
+                <span class="n">rotateRight</span><span class="p">(</span><span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">());</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">();</span>
+            <span class="p">}</span>
+    
+            <span class="k">if</span><span class="p">(</span><span class="n">w</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+                <span class="k">if</span><span class="p">((</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">BLACK</span><span class="p">)</span> <span class="o">&amp;&amp;</span> 
+                   <span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">BLACK</span><span class="p">)){</span>
+            
+                    <span class="n">w</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">RED</span><span class="p">;</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">();</span>
+            
+                <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">BLACK</span><span class="p">){</span>
+            
+                    <span class="n">w</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+                    <span class="n">w</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">RED</span><span class="p">;</span>
+                    <span class="n">rotateLeft</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
+                    <span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">();</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">w</span> <span class="o">!=</span><span class="nb">NULL</span><span class="p">){</span>
+                <span class="n">w</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span><span class="p">;</span>
+                <span class="n">w</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+            <span class="p">}</span>
+    
+            <span class="k">if</span><span class="p">(</span><span class="n">x</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+                <span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+                <span class="n">rotateRight</span><span class="p">(</span><span class="n">x</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">());</span>
+            <span class="p">}</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">getRoot</span><span class="p">();</span>
+    
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">x</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">x</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+    <span class="p">}</span>
+
+
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+<span class="cm">/* </span>
+<span class="cm"> * Maintains the red black tree properties after a node is inserted</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    RBTreeNode    The node that is in violation</span>
+<span class="cm"> * @return    true        always</span>
+<span class="cm"> */</span>
+<span class="kt">bool</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">insertFix</span><span class="p">(</span><span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">nodein</span><span class="p">){</span>
+
+    <span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="n">z</span><span class="p">;</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">nodein</span><span class="p">;</span>
+
+    <span class="k">while</span><span class="p">((</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">RED</span><span class="p">){</span> 
+        <span class="k">if</span><span class="p">((</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> 
+           <span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">==</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">())){</span>
+    
+            <span class="n">y</span> <span class="o">=</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">();</span>
+    
+            <span class="k">if</span><span class="p">((</span><span class="n">y</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">y</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">RED</span><span class="p">)){</span>
+        
+                <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+                <span class="n">y</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+                <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">RED</span><span class="p">;</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">();</span>
+        
+            <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">z</span> <span class="o">==</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()){</span>
+        
+                <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">();</span>
+                <span class="n">rotateLeft</span><span class="p">(</span><span class="n">z</span><span class="p">);</span>
+        
+            <span class="p">}</span>
+    
+            <span class="k">if</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        
+                <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+        
+                <span class="k">if</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+            
+                    <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">RED</span><span class="p">;</span>
+                    <span class="n">rotateRight</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">());</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+    
+        <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">==</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()){</span>
+    
+            <span class="n">y</span> <span class="o">=</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">();</span>
+    
+            <span class="k">if</span><span class="p">((</span><span class="n">y</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">y</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">==</span> <span class="n">RED</span><span class="p">)){</span>
+        
+                <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+                <span class="n">y</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+                <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">RED</span><span class="p">;</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">();</span>
+        
+            <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">z</span> <span class="o">==</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()){</span>
+        
+                <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">();</span>
+                <span class="n">rotateRight</span><span class="p">(</span><span class="n">z</span><span class="p">);</span>
+        
+            <span class="p">}</span>
+    
+            <span class="k">if</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        
+                <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+        
+                <span class="k">if</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>    
+            
+                    <span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">RED</span><span class="p">;</span>
+                    <span class="n">rotateLeft</span><span class="p">(</span><span class="n">z</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getParent</span><span class="p">());</span>
+        
+                <span class="p">}</span>
+            <span class="p">}</span>
+    
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+
+    <span class="n">getRoot</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">color</span> <span class="o">=</span> <span class="n">BLACK</span><span class="p">;</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* </span>
+<span class="cm"> * Search for a node and return true if in tree</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param    String        The string encapsulated in node to search for</span>
+<span class="cm"> * @return    True        if string in the tree</span>
+<span class="cm"> */</span>
+<span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">findNode</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">){</span>
+    <span class="k">return</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">RBTreeNode</span> <span class="o">*&gt;</span><span class="p">(</span><span class="n">BST</span><span class="o">::</span><span class="n">findNode</span><span class="p">(</span><span class="n">word</span><span class="p">));</span>
+<span class="p">}</span>    
+</code></pre>
+</div><p><a href="/cs/MyDictLL.h" title="pa4.c">MyDictLL.h</a></p>
+<div class="highlight"><pre><code class="cpp"><span class="cm">/*</span>
+<span class="cm"> *  File:    MyDictLL.h</span>
+<span class="cm"> *  Prj:    Dictonary</span>
+<span class="cm"> *</span>
+<span class="cm"> *  Created by Will Mernagh on April 21.</span>
+<span class="cm"> *  Copyright 2007. All rights reserved.</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="cp">#ifndef MYDICTLL</span>
+<span class="cp">#define MYDICTLL</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &quot;linklist.h&quot;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * MyDictLL</span>
+<span class="cm"> *</span>
+<span class="cm"> * Class defination of MyDictLL.</span>
+<span class="cm"> *</span>
+<span class="cm"> * This class represents a dictionary data structure where the data is  </span>
+<span class="cm"> * to be stored in a node. It is extended from linklist.h</span>
+<span class="cm"> *</span>
+<span class="cm"> * @see linklist.h</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="k">class</span> <span class="nc">MyDictLL</span> <span class="o">:</span> <span class="k">protected</span> <span class="n">linklist</span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="kt">bool</span> <span class="n">find</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+    <span class="kt">bool</span> <span class="n">insert</span><span class="p">(</span><span class="n">string</span><span class="p">);</span> 
+    <span class="kt">bool</span> <span class="n">del</span><span class="p">(</span><span class="n">string</span> <span class="n">s</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="n">display</span><span class="p">();</span>
+    <span class="n">string</span> <span class="n">min</span><span class="p">();</span>
+    <span class="n">string</span> <span class="n">max</span><span class="p">();</span> 
+    <span class="n">string</span> <span class="n">successor</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="cp">#endif</span>
+</code></pre>
+</div><p><a href="/cs/MyDictLL.cpp" title="pa4.c">MyDictLL.cpp</a></p>
+<div class="highlight"><pre><code class="cpp"><span class="cp">  </span>
+<span class="cp">#include &quot;MyDictLL.h&quot;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">bool</span> <span class="n">MyDictLL</span><span class="o">::</span><span class="n">insert</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
+
+    <span class="kt">int</span> <span class="n">position</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">head</span><span class="p">();</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">q</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">word</span> <span class="o">&lt;</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">){</span>
+        <span class="n">add_as_first</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">while</span><span class="p">(</span><span class="n">word</span> <span class="o">&gt;</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">){</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span>
+        <span class="n">position</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">word</span> <span class="o">==</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">){</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">addafter</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">word</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="kt">bool</span> <span class="n">MyDictLL</span><span class="o">::</span><span class="n">find</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">head</span><span class="p">();</span>
+
+    <span class="k">while</span><span class="p">(</span> <span class="n">q</span><span class="o">!=</span><span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">word</span> <span class="o">==</span> <span class="n">word</span> <span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">string</span> <span class="n">MyDictLL</span><span class="o">::</span><span class="n">successor</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">head</span><span class="p">();</span>
+
+    <span class="k">while</span><span class="p">(</span> <span class="n">q</span><span class="o">!=</span><span class="nb">NULL</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">word</span> <span class="o">==</span> <span class="n">word</span> <span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+                <span class="k">return</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+
+
+<span class="n">string</span> <span class="n">MyDictLL</span><span class="o">::</span><span class="n">min</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">head</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="k">return</span> <span class="n">head</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">string</span> <span class="n">MyDictLL</span><span class="o">::</span><span class="n">max</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">tail</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="k">return</span> <span class="n">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">bool</span> <span class="n">MyDictLL</span><span class="o">::</span><span class="n">del</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">linklist</span><span class="o">::</span><span class="n">del</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">MyDictLL</span><span class="o">::</span><span class="n">display</span><span class="p">(){</span>
+    <span class="n">linklist</span><span class="o">::</span><span class="n">display</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre>
+</div><p><a href="/cs/MyDictRBT.h" title="pa4.c">MyDictRBT.h</a></p>
+<div class="highlight"><pre><code class="cpp"><span class="cm">/*</span>
+<span class="cm"> *  File:    MyDictRBTRBT.h</span>
+<span class="cm"> *  Prj:    dictionary</span>
+<span class="cm"> *</span>
+<span class="cm"> *  Created by Will Mernagh on April/27.</span>
+<span class="cm"> *  Copyright 2007. All rights reserved.</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="cp">#ifndef MYDICTRBT</span>
+<span class="cp">#define MYDICTRBT</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &quot;RedBlackTree.h&quot;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * MyDictRBT</span>
+<span class="cm"> *</span>
+<span class="cm"> * Class defination of MyDictRBT.</span>
+<span class="cm"> *</span>
+<span class="cm"> * This class represents a dictionary data structure where the data </span>
+<span class="cm"> * is to be stored in a node. It is extended from RedBlackTree.h</span>
+<span class="cm"> *</span>
+<span class="cm"> * @see RedBlackTree.h</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="k">class</span> <span class="nc">MyDictRBT</span> <span class="o">:</span> <span class="k">protected</span> <span class="n">RedBlackTree</span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="kt">bool</span> <span class="n">find</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+    <span class="kt">bool</span> <span class="n">insert</span><span class="p">(</span><span class="n">string</span><span class="p">);</span> 
+    <span class="kt">bool</span> <span class="n">del</span><span class="p">(</span><span class="n">string</span> <span class="n">s</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="n">display</span><span class="p">();</span>
+    <span class="n">string</span> <span class="n">min</span><span class="p">();</span>
+    <span class="n">string</span> <span class="n">max</span><span class="p">();</span> 
+    <span class="n">string</span> <span class="n">successor</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="cp">#endif</span>
+</code></pre>
+</div><div class="highlight"><pre><code class="cpp"><span class="cm">/*</span>
+<span class="cm"> *  File:    MyDictRBTRBT.cpp</span>
+<span class="cm"> *  Prj:    dictionary</span>
+<span class="cm"> *</span>
+<span class="cm"> *  Created by Will Mernagh on April/27.</span>
+<span class="cm"> *  Copyright 2007. All rights reserved.</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+
+<span class="cp">#include &quot;MyDictRBT.h&quot;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">bool</span> <span class="n">MyDictRBT</span><span class="o">::</span><span class="n">insert</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">insert</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+<span class="p">}</span>
+
+
+<span class="kt">bool</span> <span class="n">MyDictRBT</span><span class="o">::</span><span class="n">find</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">find</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">string</span> <span class="n">MyDictRBT</span><span class="o">::</span><span class="n">successor</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">RBTreeNode</span> <span class="o">*</span> <span class="n">sucsr</span><span class="p">;</span>
+    <span class="n">sucsr</span> <span class="o">=</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">successor</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">sucsr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="k">return</span> <span class="n">sucsr</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">string</span> <span class="n">MyDictRBT</span><span class="o">::</span><span class="n">min</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">search</span><span class="p">;</span>
+
+    <span class="n">search</span> <span class="o">=</span> <span class="n">getRoot</span><span class="p">();</span>
+
+    <span class="k">while</span><span class="p">(</span><span class="n">search</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="n">search</span><span class="o">-&gt;</span><span class="n">getLeft</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">search</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+<span class="n">string</span> <span class="n">MyDictRBT</span><span class="o">::</span><span class="n">max</span><span class="p">()</span>
+<span class="p">{</span>
+
+    <span class="n">RBTreeNode</span> <span class="o">*</span><span class="n">search</span><span class="p">;</span>
+
+    <span class="n">search</span> <span class="o">=</span> <span class="n">getRoot</span><span class="p">();</span>
+
+    <span class="k">while</span><span class="p">(</span><span class="n">search</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">){</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="n">search</span><span class="o">-&gt;</span><span class="n">getRight</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">search</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+<span class="kt">bool</span> <span class="n">MyDictRBT</span><span class="o">::</span><span class="n">del</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">del</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">MyDictRBT</span><span class="o">::</span><span class="n">display</span><span class="p">(){</span>
+    <span class="n">RedBlackTree</span><span class="o">::</span><span class="n">display</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre>
+</div><p><a href="/cs/main.cpp" title="pa4.c">main.cpp</a></p>
+<div class="highlight"><pre><code class="cpp"><span class="cm">/*</span>
+<span class="cm"> *  File:    main.cpp</span>
+<span class="cm"> *  Prj:    Dictonary</span>
+<span class="cm"> *</span>
+<span class="cm"> *  Created by Will Mernagh on April 21.</span>
+<span class="cm"> *  Copyright 2007. All rights reserved.</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &quot;MyDictLL.h&quot;</span>
+<span class="cp">#include &quot;MyDictRBT.h&quot;</span>
+<span class="cp">#include &lt;stdio.h&gt;</span>
+<span class="cp">#include &lt;fstream&gt;</span>
+<span class="cp">#include &lt;string&gt;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="n">string</span> <span class="n">lowerCase</span><span class="p">(</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">);</span>
+    <span class="cm">/* </span>
+<span class="cm"> * main</span>
+<span class="cm"> * </span>
+<span class="cm"> * This main function is used to test the data structures linklist and </span>
+<span class="cm"> * RedBlackTree</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+
+    <span class="n">MyDictRBT</span> <span class="n">md</span><span class="p">;</span> 
+    <span class="c1">//MyDictLL md;</span>
+    <span class="n">ifstream</span> <span class="n">inFile1</span><span class="p">,</span> <span class="n">inFile2</span><span class="p">;</span>
+    <span class="n">string</span> <span class="n">word</span><span class="p">,</span> <span class="n">cleanword</span><span class="p">;</span>  <span class="c1">// The user&#39;s input.</span>
+    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">file1</span><span class="p">,</span> <span class="o">*</span><span class="n">file2</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">ok_chars</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;0123456789abcdefghijklmnopqrstuvwxyz&quot;</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">pun_first</span><span class="p">,</span> <span class="n">pun_last</span><span class="p">;</span>
+
+        <span class="cm">/* read command line */</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">){</span>
+
+        <span class="n">size</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
+        <span class="n">file1</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+        <span class="n">file2</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+ 
+    <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">){</span> 
+
+        <span class="n">file1</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+        <span class="n">file2</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+
+        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;Usage argv[0] &lt;file1&gt; &lt;file2&gt; [optional: &lt;size&gt;]</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="p">}</span>
+
+
+
+    <span class="n">inFile1</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">file1</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">inFile1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Unable to open file1&quot;</span><span class="p">;</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// terminate with error</span>
+    <span class="p">}</span>
+
+
+        <span class="cm">/* Read in words until end of file or until size words is reached</span>
+<span class="cm">     * which ever occurs first</span>
+<span class="cm">     */</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">inFile1</span> <span class="o">&gt;&gt;</span> <span class="n">word</span> <span class="o">&amp;&amp;</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="cm">/* These next few lines make all words lowercase and removes</span>
+<span class="cm">         * punctuation so that the dictionary will only have words </span>
+<span class="cm">         * in one case</span>
+<span class="cm">         */</span>
+        <span class="n">word</span> <span class="o">=</span>  <span class="n">lowerCase</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+
+            <span class="cm">/* Finds 1st occurance of ok char */</span>
+        <span class="n">pun_first</span> <span class="o">=</span> <span class="n">word</span><span class="p">.</span><span class="n">find_first_of</span><span class="p">(</span><span class="n">ok_chars</span><span class="p">);</span>
+
+            <span class="cm">/* Finds last occurance of ok char */</span>
+        <span class="n">pun_last</span> <span class="o">=</span> <span class="n">word</span><span class="p">.</span><span class="n">find_last_of</span><span class="p">(</span><span class="n">ok_chars</span><span class="p">);</span>
+
+            <span class="cm">/* if a negative number then no good chars */</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">pun_first</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">){</span>
+                <span class="cm">/* cleanword = the substring of good chars, notice that </span>
+<span class="cm">               this will allow words of the form &quot;mid-shape&quot; and &quot;john&#39;s&quot;</span>
+<span class="cm">             */</span>
+            <span class="n">cleanword</span> <span class="o">=</span> <span class="n">word</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="n">pun_first</span><span class="p">,(</span><span class="n">pun_last</span> <span class="o">-</span> <span class="n">pun_first</span> <span class="o">+</span> <span class="mi">1</span><span class="p">));</span>
+            <span class="n">md</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">cleanword</span><span class="p">);</span>
+            <span class="n">n</span><span class="o">++</span><span class="p">;</span>
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+
+    <span class="n">inFile1</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+
+    <span class="n">inFile2</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">file2</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">inFile2</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Unable to open file2&quot;</span><span class="p">;</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// terminate with error</span>
+    <span class="p">}</span>
+
+        <span class="cm">/* Read in words until end of file or until size words is reached</span>
+<span class="cm">     * which ever occurs first</span>
+<span class="cm">     */</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">inFile2</span> <span class="o">&gt;&gt;</span> <span class="n">word</span> <span class="o">&amp;&amp;</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+
+           <span class="cm">/* These next few lines make all words lowercase and removes</span>
+<span class="cm">        * punctuation so that the dictionary will only have words </span>
+<span class="cm">        * in one case</span>
+<span class="cm">        */</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="n">lowerCase</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+
+            <span class="cm">/* Finds 1st occurance of ok char */</span>
+        <span class="n">pun_first</span> <span class="o">=</span> <span class="n">word</span><span class="p">.</span><span class="n">find_first_of</span><span class="p">(</span><span class="n">ok_chars</span><span class="p">);</span>
+
+            <span class="cm">/* Finds last occurance of ok char */</span>
+        <span class="n">pun_last</span> <span class="o">=</span> <span class="n">word</span><span class="p">.</span><span class="n">find_last_of</span><span class="p">(</span><span class="n">ok_chars</span><span class="p">);</span>
+
+            <span class="cm">/* if a negative number then no good chars */</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">pun_first</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">){</span>
+                <span class="cm">/* cleanword = the substring of good chars, notice that this</span>
+<span class="cm">             * will allow words of the form &quot;mid-shape&quot; and &quot;john&#39;s&quot;</span>
+<span class="cm">             */</span>
+            <span class="n">cleanword</span> <span class="o">=</span> <span class="n">word</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="n">pun_first</span><span class="p">,(</span><span class="n">pun_last</span> <span class="o">-</span> <span class="n">pun_first</span> <span class="o">+</span> <span class="mi">1</span><span class="p">));</span>
+            <span class="n">md</span><span class="p">.</span><span class="n">del</span><span class="p">(</span><span class="n">cleanword</span><span class="p">);</span>
+            <span class="n">n</span><span class="o">++</span><span class="p">;</span>
+        <span class="p">}</span>
+
+    <span class="p">}</span>
+
+
+    <span class="n">inFile2</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+
+    <span class="c1">//md.display();</span>
+    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">The Max is &quot;</span><span class="o">&lt;&lt;</span><span class="n">md</span><span class="p">.</span><span class="n">max</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;The Min is &quot;</span><span class="o">&lt;&lt;</span><span class="n">md</span><span class="p">.</span><span class="n">min</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;n = &quot;</span><span class="o">&lt;&lt;</span><span class="n">n</span><span class="o">&lt;&lt;</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="cm">/*</span>
+<span class="cm">    if(md.find(&quot;why&quot;)){</span>
+<span class="cm">        cout&lt;&lt;&quot;Searching for &#39;why&#39; - found \n&quot;;</span>
+<span class="cm">    }</span>
+<span class="cm">    cout&lt;&lt;&quot;The Successor of Min is &quot;&lt;&lt;md.successor(md.min())&lt;&lt;&quot;\n&quot;;</span>
+<span class="cm">     */</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+
+
+<span class="p">}</span>
+
+<span class="cm">/* converts a string to lowercase char at a time */</span>
+<span class="n">string</span> <span class="n">lowerCase</span><span class="p">(</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">char</span><span class="o">*</span> <span class="n">buf</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="p">[</span><span class="n">s</span><span class="p">.</span><span class="n">length</span><span class="p">()];</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">copy</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">s</span><span class="p">.</span><span class="n">length</span><span class="p">());</span>
+    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="n">s</span><span class="p">.</span><span class="n">length</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tolower</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+    <span class="n">string</span> <span class="n">r</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">s</span><span class="p">.</span><span class="n">length</span><span class="p">());</span>
+    <span class="k">delete</span> <span class="n">buf</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">r</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div><p><a href="/cs/Makefile" title="pa4.c">Makefile</a></p>
+<div class="highlight"><pre><code class="bash"><span class="c"># --- macros</span>
+<span class="nv">CC</span><span class="o">=</span>g++
+<span class="nv">CFLAGS</span><span class="o">=</span> -c -O2 -Wall
+
+<span class="c"># --- targets</span>
+dictionary: main.o MyDictRBT.o MyDictLL.o linklist.o RedBlackTree.o BinarySearchTree.o nodes.o
+    <span class="k">$(</span>CC<span class="k">)</span> -o dictionary -s main.o RedBlackTree.o BinarySearchTree.o linklist.o nodes.o MyDictLL.o MyDictRBT.o
+
+main.o: main.cpp MyDictLL.h MyDictRBT.h
+    <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> main.cpp
+
+MyDictRBT.o: MyDictRBT.cpp MyDictRBT.h RedBlackTree.h
+    <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> MyDictRBT.cpp
+
+MyDictLL.o: MyDictLL.cpp MyDictLL.h linklist.h
+    <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> MyDictLL.cpp
+
+linklist.o: linklist.cpp linklist.h nodes.h
+    <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> linklist.cpp
+
+RedBlackTree.o: RedBlackTree.cpp RedBlackTree.h nodes.h BinarySearchTree.h
+    <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> RedBlackTree.cpp
+
+BinarySearchTree.o: BinarySearchTree.cpp BinarySearchTree.h nodes.h
+    <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> BinarySearchTree.cpp
+
+nodes.o: nodes.cpp nodes.h
+    <span class="k">$(</span>CC<span class="k">)</span> <span class="k">$(</span>CFLAGS<span class="k">)</span> nodes.cpp
+
+<span class="c"># --- remove binary and executable files</span>
+cleanall:
+    rm -f dictionary *.o 
+clean:
+    rm -f *.o 
+</code></pre>
+</div>
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'willspics'; 
+    var disqus_developer = 1; // developer mode is on
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    //var disqus_identifier = '';
+    //var disqus_url = 'http://will.willandorla.com/2007/04/algorithms-project';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+</div>
+
+<div id="boastful">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="im_a_muppet">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+</div>
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-10956030-4");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+</body>
+</html>
