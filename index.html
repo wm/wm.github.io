@@ -18,7 +18,7 @@
       height: 85px;
       margin-top: 10px;
       text-align: center;
-      width: 570px;
+      max-width: 570px;
     }
     img {
       -webkit-box-shadow: rgb(255, 255, 255) 0px 0px 0px 3px, rgb(238, 238, 238) 0px 0px 0px 5px;
@@ -76,6 +76,21 @@
     a {
       text-decoration: none;
       color: rgb(51, 51, 51);
+    }
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 50px;
+        margin-top: 20px;
+        line-height: 40px;
+      }
+      h2 {
+        font-size: 20px;
+        margin: 20px 0 30px 0;
+      }
+      div {
+        display: block;
+        margin: 20px 12px 0 12px;
+      }
     }
   </style>
 </head>
