@@ -102,7 +102,7 @@
 
 <p>The final step is to remove the folders from the initial repository and add in the missing folders as submodules.</p>
 <div class='highlight'><pre><code class='bash'>  ~ <span class='nv'>$ </span><span class='nb'>cd </span>Development/LUF
-  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git rm src/MSEL src/SigEvServer src/WebServices
+  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git rm -r src/MSEL src/SigEvServer src/WebServices
   <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git commit -m <span class='s2'>&quot;Removing the folders that are now repositories&quot;</span>
 
   <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git submodule add git@github.com:wmernagh/MSEL.git src/MSEL
@@ -110,7 +110,7 @@
   <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git submodule add git@github.com:wmernagh/WebServices.git src/WebServices
 
   <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git submodule init
-  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git submoduel update
+  <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git submodule update
   <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git add .gitmodules src
   <span class='o'>(</span>master<span class='o'>)</span> LUF <span class='nv'>$ </span>git commit -m <span class='s2'>&quot;Added in submodules for removed folders&quot;</span>
 </code></pre>
